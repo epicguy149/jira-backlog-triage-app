@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Forge Hello World
 
 This project contains a Forge app written in Javascript that displays `Hello World!` in a Jira backlog action. 
