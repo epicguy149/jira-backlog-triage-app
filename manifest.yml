@@ -1,0 +1,18 @@
+modules:
+  jira:backlogAction:
+    - key: log-juggler-hello-world-backlog-action
+      resource: main
+      resolver:
+        function: resolver
+      viewportSize: medium
+      title: Log Juggler
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: static/hello-world/build
+app:
+  runtime:
+    name: nodejs20.x
+  id: ari:cloud:ecosystem::app/fdbf3ad6-ae55-436e-9af0-3a05f9a89ae7
