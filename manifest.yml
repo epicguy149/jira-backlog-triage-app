@@ -57,8 +57,9 @@ permissions:
     - write:sprint:jira-software
     - read:board-scope:jira-software
     - write:board-scope:jira-software
+    - storage:app
 
   external:
     fetch:
       backend:
-        - https://api.perplexity.ai
+        - "generativelanguage.googleapis.com"
