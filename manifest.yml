@@ -40,7 +40,7 @@ resources:
     path: static/hello-world/build
 
 app:
-  id: ari:cloud:ecosystem::app/31fa5ffe-6a51-4d63-9b06-ff06d058fd83
+  id: ari:cloud:ecosystem::app/0a66e205-3a4f-4fe1-983c-5c484a0653cd
   runtime:
     name: nodejs20.x
 
@@ -62,4 +62,4 @@ permissions:
   external:
     fetch:
       backend:
-        - "generativelanguage.googleapis.com"
+        - https://api.perplexity.ai
