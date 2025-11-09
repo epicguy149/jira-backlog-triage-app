@@ -13,34 +13,24 @@ modules:
       resolver: { function: resolver }
       viewportSize: large
       title: Log Juggler
-      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
 
   jira:globalPage:
     - key: log-juggler-global
-      title: Log Juggler
-      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
       resource: main
       resolver: { function: resolver }
-      route: /log-juggler
-
-  jira:issuePanel:
-    - key: log-juggler-issue-panel
+      viewportSize: large
       title: Log Juggler
-      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
-      resource: main
-      resolver: { function: resolver }
-      viewportSize: medium
 
   function:
     - key: resolver
-      handler: index.handler
+      handler: backend/presentation/index.handler
 
 resources:
   - key: main
-    path: static/hello-world/build
+    path: frontend/build
 
 app:
-  id: ari:cloud:ecosystem::app/0a66e205-3a4f-4fe1-983c-5c484a0653cd
+  id: ari:cloud:ecosystem::app/3bd57274-9cf0-4669-a26b-cea953a174ec
   runtime:
     name: nodejs20.x
 
@@ -49,17 +39,8 @@ permissions:
     - read:jira-work
     - write:jira-work
     - read:jira-user
-    - read:project:jira
-    - read:issue:jira-software
-    - write:issue:jira-software
-    - read:issue-details:jira
-    - read:sprint:jira-software
-    - write:sprint:jira-software
-    - read:board-scope:jira-software
-    - write:board-scope:jira-software
-    - storage:app
+    - manage:jira-project
+    - manage:jira-configuration
 
   external:
-    fetch:
-      backend:
-        - https://api.perplexity.ai
+    # NOTE: for API keys, use forge variables set, read using process.env.PERPLEXITY_API_KEY
