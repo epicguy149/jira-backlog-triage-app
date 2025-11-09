@@ -5,11 +5,20 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "@atlaskit/eslint-plugin-design-system": "^13.23.3",
+    "@atlaskit/eslint-plugin-ui-styling-standard": "^1.4.5",
+    "@types/node": "^24.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@forge/resolver": "1.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "zod": "^4.1.12"
   }
 }
