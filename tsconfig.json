@@ -1,21 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "jsx": "react-jsx",
-    "jsxImportSource": "@compiled/react",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "@contracts/*": ["contracts/*"],
-      "@backend/*": ["backend/*"],
-      "@frontend/*": ["frontend/src/*"]
+      "@src/*": ["src/*"]
     }
   },
-  "include": ["frontend/src", "backend", "contracts"]
+  "include": ["src", "contracts"]
 }
