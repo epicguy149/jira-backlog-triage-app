@@ -4,7 +4,6 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@atlaskit/app-provider": "^3.2.5",
     "@atlaskit/css": "^0.15.2",
     "@atlaskit/css-reset": "^6.16.0",
     "@atlaskit/tokens": "^8.0.0",
@@ -14,10 +13,13 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@atlaskit/app-provider": "^3.2.5",
     "@atlaskit/eslint-plugin-design-system": "^13.23.3",
     "@atlaskit/eslint-plugin-ui-styling-standard": "^1.4.5",
     "@atlaskit/stylelint-design-system": "^4.1.4",
     "@babel/core": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
     "@compiled/babel-plugin": "^0.38.1",
     "@compiled/parcel-config": "^0.5.6",
     "@types/react": "^18.3.26",
@@ -28,9 +30,8 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "parcel src/index.html --dist-dir build --no-cache",
-    "build": "parcel build src/index.html --dist-dir build --no-cache",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx src"
+    "start": "parcel index.html --dist-dir build --no-cache",
+    "build": "parcel build index.html --dist-dir build --no-cache"
   },
   "browserslist": {
     "production": [
