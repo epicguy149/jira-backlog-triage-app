@@ -38,7 +38,7 @@ module.exports = {
 
   overrides: [
     {
-      files: ['backend/**/*.ts', 'contracts/**/*.ts'],
+      files: ['src/**/*.ts', 'contracts/**/*.ts'],
       env: { browser: false, node: true },
       rules: {
         '@atlaskit/design-system/ensure-design-token-usage': 'off',
