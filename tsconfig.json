@@ -3,15 +3,10 @@
     "target": "ES2022",
     "lib": ["ES2022"],
     "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "skipLibCheck": true,
-    "isolatedModules": true,
-    "baseUrl": ".",
-    "paths": {
-      "@contracts/*": ["contracts/*"],
-      "@src/*": ["src/*"]
-    }
+    "isolatedModules": true
   },
-  "include": ["src", "contracts"]
+  "include": ["src"]
 }

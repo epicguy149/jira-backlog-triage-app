@@ -1,8 +1,6 @@
 import Resolver from '@forge/resolver';
-import { getText } from '@backend/application/get-text';
-import { GetTextRequestSchema,
-  type GetTextResponse,
- } from '@contracts/api';
+import { getText } from '../application/get-text';
+import { GetTextRequestSchema, type GetTextResponse } from '../../contracts/api';
 
 const resolver = new Resolver();
 
