@@ -23,11 +23,13 @@ modules:
 
   function:
     - key: resolver
-      handler: backend/presentation/index.handler
+      handler: presentation/index.handler
 
 resources:
   - key: main
     path: frontend/build
+    tunnel:
+      port: 1234
 
 app:
   id: ari:cloud:ecosystem::app/3bd57274-9cf0-4669-a26b-cea953a174ec
@@ -42,5 +44,5 @@ permissions:
     - manage:jira-project
     - manage:jira-configuration
 
-  external:
-    # NOTE: for API keys, use forge variables set, read using process.env.PERPLEXITY_API_KEY
+# external:
+#   # NOTE: for API keys, use forge variables set, read using process.env.PERPLEXITY_API_KEY
