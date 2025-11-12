@@ -28,7 +28,7 @@
     "zod": "^3.25.76"
   },
   "scripts": {
-    "reset": "rimraf ./node_modules && rimraf ./frontend/node_modules && rimraf ./package-lock.json && rimraf ./frontend/package-lock.json",
+    "reset": "rimraf ./node_modules && rimraf ./frontend/node_modules && rimraf ./package-lock.json && rimraf ./frontend/package-lock.json && rimraf ./frontend/build",
     "install_": "npm install && npm install --prefix frontend",
     "clean": "rimraf ./frontend/build",
     "build": "npm run clean && parcel build frontend/index.html --dist-dir frontend/build --public-url ./",
