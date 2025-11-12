@@ -40,7 +40,8 @@ resources:
     path: static/hello-world/build
 
 app:
-  id: ari:cloud:ecosystem::app/0a66e205-3a4f-4fe1-983c-5c484a0653cd
+  id: ari:cloud:ecosystem::app/300741ed-fee5-4761-8236-724da190eac0
+
   runtime:
     name: nodejs20.x
 
