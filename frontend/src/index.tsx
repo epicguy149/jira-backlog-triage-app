@@ -1,9 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { view } from '@forge/bridge';
-import AppProvider from '@atlaskit/app-provider';
+import AtlaskitAppProvider from '@atlaskit/app-provider';
 import '@atlaskit/css-reset';
 import App from './App';
+import { AppProvider } from './AppContext';
 
 view.theme.enable();
 
@@ -12,8 +13,10 @@ const root = createRoot(container!);
 
 root.render(
   <React.StrictMode>
-    <AppProvider>
-      <App />
-    </AppProvider>
+    <AtlaskitAppProvider>
+      <AppProvider>
+        <App />
+      </AppProvider>
+    </AtlaskitAppProvider>
   </React.StrictMode>
 );
