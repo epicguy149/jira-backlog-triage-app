@@ -13,6 +13,7 @@ modules:
       resolver: { function: resolver }
       viewportSize: large
       title: Log Juggler
+      layout: blank
 
   jira:globalPage:
     - key: log-juggler-global
@@ -20,6 +21,7 @@ modules:
       resolver: { function: resolver }
       viewportSize: large
       title: Log Juggler
+      layout: blank
 
   function:
     - key: resolver
