@@ -1,15 +1,18 @@
 import React, { useRef, useEffect } from 'react';
 import { useAppContext, type View } from '../AppContext';
 import { 
-  TopNav, 
   TopNavStart, 
   TopNavMiddle, 
   TopNavEnd, 
-  Root,
-  SideNavToggleButton 
+  SideNavToggleButton,
+  Help
 } from '@atlaskit/navigation-system';
-import { Settings } from '@atlaskit/navigation-system/top-nav-items';
-import Button from '@atlaskit/button/new';
+import { TopNavButton } from '@atlaskit/navigation-system/experimental/top-nav-button';
+import { Settings} from '@atlaskit/navigation-system/top-nav-items';
+import GridIcon from '@atlaskit/icon/core/grid';
+import ChangesIcon from '@atlaskit/icon/core/changes';
+import AiChatIcon from '@atlaskit/icon/core/ai-chat';
+import Heading from '@atlaskit/heading';
 
 export default React.memo(function AppTopNav() {
     const { view, setView, isSettingsOpen, setIsSettingsOpen, setBanner } = useAppContext();
@@ -41,41 +44,48 @@ export default React.memo(function AppTopNav() {
     };
 
     return (
-        <TopNav>
-
+        <>
             {/* side nav toggle only shown on swipe mode for now */}
             <TopNavStart>
-                {view === 'swipe' ? <SideNavToggleButton 
+                <SideNavToggleButton 
                     collapseLabel="Collapse sidebar"
 					expandLabel="Expand sidebar"
-                /> : null}
+                    defaultCollapsed
+                />
+
+                {/* app name doenst render for some reason */}
+                {/* <AppLogo
+					href="https://jira.atlassian.com"
+					icon={AtlassianIcon}
+					name="Log Juggler"
+					label="App name"
+				/> */}
+
+                <Heading size="medium" color="color.text.inverse">Log Juggler</Heading>
+                
+                {/* ADS beta feature - doesn't work*/}
+                {/* <CustomTitle>Log Juggler</CustomTitle> */}
+                
+                <TopNavButton iconBefore={ChangesIcon} onClick={() => changeView('swipe')}>Swipe</TopNavButton>
+
+                <TopNavButton iconBefore={GridIcon} onClick={() => changeView('matrix')}>Matrix</TopNavButton>
             </TopNavStart>
-
-            <TopNavMiddle>
-                <Button 
-                    appearance={view === 'swipe' ? 'primary' : 'subtle'} 
-                    aria-pressed={view === 'swipe'}
-                    onClick={() => changeView('swipe')}
-                >
-                    Swipe
-                </Button>
-
-                <Button 
-                    appearance={view === 'matrix' ? 'primary' : 'subtle'} 
-                    aria-pressed={view === 'matrix'}
-                    onClick={() => changeView('matrix')}
-                >
-                    Matrix
-                </Button>
-            </TopNavMiddle>
+            
+            {/* search is ADS beta feature - doesn't work */}
+            {/* <TopNavMiddle>
+				<Search label="Search" />
+                <TopNavIconButton icon={FilterIcon} label="Filter" />
+			</TopNavMiddle> */}
 
             <TopNavEnd>
+                <TopNavButton iconBefore={AiChatIcon}>Chat with AI</TopNavButton>
+                <Help label="Help" />
                 <Settings
                     label="Settings"
                     onClick={() => setIsSettingsOpen(!isSettingsOpen)}
                     isSelected={isSettingsOpen}
                 />
             </TopNavEnd>
-        </TopNav>
+        </>
     );
 });
