@@ -43,6 +43,11 @@ permissions:
     - read:jira-user
     - manage:jira-project
     - manage:jira-configuration
+  content:
+    scripts:
+      - unsafe-inline
+    styles:
+      - unsafe-inline
 
 # external:
 #   # NOTE: for API keys, use forge variables set, read using process.env.PERPLEXITY_API_KEY
