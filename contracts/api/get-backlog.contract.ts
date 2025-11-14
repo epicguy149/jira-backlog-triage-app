@@ -6,8 +6,10 @@ export const SwipeIssueSchema = z.object({
     key: z.string(),
     summary: z.string(),
     status: z.string(),
-    priority: z.string().nullable(),
-    asignee: z.string().nullable(),
+    priorityName: z.string().nullable(),
+    priorityIconUrl: z.string().nullable(),
+    assigneeDisplayName: z.string().nullable(),
+    assigneeAvatarUrl: z.string().nullable(),
 
     // for future use
     description: z.string().nullable(),
