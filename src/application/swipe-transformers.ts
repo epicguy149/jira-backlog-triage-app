@@ -20,6 +20,9 @@ type JiraIssue = {
         // returns as ADF 
         description?: unknown;
         updated?: string;
+        issueType?: {
+            name: string;
+        }
     };
 }
 
@@ -65,6 +68,7 @@ export function toSwipeIssue(
             null,
         description,
         swiped: opts.swiped ?? false,
+        issueTypeName: fields.issueType?.name ?? null,
     };
 }
 
