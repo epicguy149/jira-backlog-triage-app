@@ -5,15 +5,7 @@ import {
     SwipeIssuePageSchema
 } from '../../contracts/api'
 import { type JiraBacklogResponse, toSwipeIssue }  from './swipe-transformers';
-import { kvs } from '@forge/kvs';
-
-// key for forge kvs storage
-const SWIPED_KEY_PREFIX = 'log-juggler.swiped';
-
-// store swiped state per user per board
-function swipedStorageKey(boardId: string | number, accountId: string): string {
-    return `${SWIPED_KEY_PREFIX}:${String(boardId)}`;
-}
+import { getSwipedSet } from './swipe-storage';
 
 type GetBacklogContext = {
     accountId: string;
@@ -67,12 +59,7 @@ export async function getBacklog(
         return SwipeIssuePageSchema.parse(empty);
     }
 
-    const swipedKey = swipedStorageKey(boardId, accountId);
-    const swipedRes = await kvs.get<string[]>(swipedKey);
-
-    // get swiped issue keys from forge kvs
-    const swipedArray: string[] = (swipedRes as string[] | undefined) ?? [];
-    const swipedSet = new Set(swipedArray);
+    const swipedSet = await getSwipedSet(boardId, accountId);
 
     const swipeIssues = issues.map((issue) => 
         toSwipeIssue(issue, {
