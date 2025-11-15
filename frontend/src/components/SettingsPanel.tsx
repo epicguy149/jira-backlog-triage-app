@@ -1,9 +1,8 @@
 import { useAppContext } from "../app/AppContext"
-import { Inline, Box } from '@atlaskit/primitives';
+import { Box } from '@atlaskit/primitives';
 import Heading from '@atlaskit/heading';
 import Button from '@atlaskit/button/new';
 import CrossIcon from '@atlaskit/icon/core/cross';
-
 
 export default function SettingsPanel() {
     const { setIsSettingsOpen } = useAppContext();
