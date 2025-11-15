@@ -6,6 +6,7 @@ import type {
     GetBacklogResponse,
     SetIssueSwipedRequest,
     SetIssueSwipedResponse,
+    SwipeFilterState,
 } from '~contracts/api';
 
 export async function fetchBacklog(
@@ -19,3 +20,8 @@ export async function setIssueSwiped(
 ): Promise<SetIssueSwipedResponse> {
     return invoke('setIssueSwiped', params) as Promise<SetIssueSwipedResponse>;
 }
+
+type FetchBacklogParams = Omit<GetBacklogRequest, 'boardId'> & {
+    boardId: string | number;
+    filters?: SwipeFilterState;
+};
