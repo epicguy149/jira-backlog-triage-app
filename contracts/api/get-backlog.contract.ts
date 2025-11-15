@@ -15,9 +15,6 @@ export const SwipeIssueSchema = z.object({
     description: z.string().nullable(),
     // to filter swiped/unswiped
     swiped: z.boolean().optional().default(false),
-    aiSummary: z.string().nullable().optional(),
-    // updated if issue updated since aiSummary generated
-    aiSummaryStale: z.boolean().optional(),
 })
 
 export type SwipeIssue = z.infer<typeof SwipeIssueSchema>;
@@ -41,6 +38,7 @@ export const GetBacklogRequestSchema = z.object({
 
     // default 50
     maxResults: z.number().int().min(1).optional(),
+    searchQuery: z.string().optional(),
 })
 
 export type GetBacklogRequest = z.infer<typeof GetBacklogRequestSchema>;
