@@ -18,6 +18,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@atlaskit/badge": "^18.2.4",
     "@atlaskit/tokens": "^8.0.0",
     "@compiled/parcel-config": "^0.5.6",
     "@forge/api": "^6.2.0",
