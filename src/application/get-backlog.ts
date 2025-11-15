@@ -6,6 +6,7 @@ import {
 } from '../../contracts/api'
 import { type JiraBacklogResponse, toSwipeIssue }  from './swipe-transformers';
 import { getSwipedSet } from './swipe-storage';
+import { buildJqlQuery } from './jql-builder';
 
 type GetBacklogContext = {
     accountId: string;
@@ -15,14 +16,28 @@ export async function getBacklog(
     payload: GetBacklogRequest,
     ctx: GetBacklogContext,
 ): Promise<GetBacklogResponse> {
-    const { boardId, startAt = 0, maxResults = 20, searchQuery } = payload;
+    const { boardId, startAt = 0, maxResults, searchQuery, filters } = payload;
     const { accountId } = ctx;
 
     if (!boardId) {
         throw new Error('no boardId provided');
     }
 
-    const fields = 'summary,status,priority,assignee,description,updated';
+    const swipedSet = await getSwipedSet(boardId, accountId);
+
+    const jql = buildJqlQuery({
+        searchQuery,
+        filters,
+        swipedSet,
+    });
+
+    if (jql === null) {
+        return SwipeIssuePageSchema.parse({
+            issues: [], total: 0, startAt, maxResults
+        });
+    }
+
+    const fields = 'summary,status,priority,assignee,description,updated,issuetype';
 
     const params = new URLSearchParams({
         startAt: String(startAt),
@@ -30,15 +45,11 @@ export async function getBacklog(
         fields,
     });
 
-    if (searchQuery && searchQuery.trim() !== '') {
-        // escape double quotes
-        const query = searchQuery.replace(/"/g, '\\"');
-        params.set('jql', `text ~ "${query}"`);
+    if (jql) {
+        params.set('jql', jql);
     }
 
-    const reqUrl = `/rest/agile/1.0/board/${boardId}/backlog?${params.toString()}`;
-
-    const res = await api.asUser().requestJira(route`${reqUrl}`);
+    const res = await api.asUser().requestJira(route`/rest/agile/1.0/board/${boardId}/backlog?${params.toString()}`);
 
     if (!res.ok) {
         const text = await res.text();
@@ -46,7 +57,11 @@ export async function getBacklog(
     }
 
     const data = (await res.json()) as JiraBacklogResponse;
-    const issues = data.issues;
+
+    // remove epics
+    const issues = data.issues.filter(
+      (issue) => issue.fields.issueType?.name?.toLowerCase() !== 'epic'
+    ) ?? [];
 
     // handle no issues post filter
     if (issues.length === 0) {
@@ -58,8 +73,6 @@ export async function getBacklog(
         };
         return SwipeIssuePageSchema.parse(empty);
     }
-
-    const swipedSet = await getSwipedSet(boardId, accountId);
 
     const swipeIssues = issues.map((issue) => 
         toSwipeIssue(issue, {
