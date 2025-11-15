@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+export const SwipeFilterStateSchema = z.object({
+    status: z.object({
+        unswiped: z.boolean(),
+        swiped: z.boolean(),
+    }),
+    // future filters here
+    // e.g., priorityName: z.array(z.string()).optional(),
+});
+
+export type SwipeFilterState = z.infer<typeof SwipeFilterStateSchema>;
+
 // GET /rest/agile/1.0/board/{boardId}/backlog RESPONSE
 export const SwipeIssueSchema = z.object({
     id: z.string(),
@@ -10,6 +21,7 @@ export const SwipeIssueSchema = z.object({
     priorityIconUrl: z.string().nullable(),
     assigneeDisplayName: z.string().nullable(),
     assigneeAvatarUrl: z.string().nullable(),
+    issueTypeName: z.string().nullable(),
 
     // for future use
     description: z.string().nullable(),
@@ -39,6 +51,7 @@ export const GetBacklogRequestSchema = z.object({
     // default 50
     maxResults: z.number().int().min(1).optional(),
     searchQuery: z.string().optional(),
+    filters: SwipeFilterStateSchema.optional(),
 })
 
 export type GetBacklogRequest = z.infer<typeof GetBacklogRequestSchema>;
