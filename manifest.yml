@@ -53,8 +53,6 @@ permissions:
       - unsafe-inline
     styles:
       - unsafe-inline
-    popups:
-      - unsafe-inline
 
 # external:
 #   # NOTE: for API keys, use forge variables set, read using process.env.PERPLEXITY_API_KEY

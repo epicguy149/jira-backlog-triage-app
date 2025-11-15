@@ -13,7 +13,8 @@ import Heading from '@atlaskit/heading';
 import UndoIcon from '@atlaskit/icon/core/undo';
 import SprintIcon from '@atlaskit/icon/core/sprint';
 import DeleteIcon from '@atlaskit/icon/core/delete';
-import Link from '@atlaskit/link';
+import { LinkButton } from '@atlaskit/button/new';
+import LinkExternalIcon from '@atlaskit/icon/core/link-external';
 
 const exampleHref = "http://www.bitbucket.com"
 
@@ -35,9 +36,9 @@ const ActionHistoryFlyout = ({ issueKey, type }: {issueKey: string, type: 'MOVED
         {/* link to issue */}
         <MenuSection>
             <MenuList>
-                <Link href={exampleHref} target="_blank">
+                <LinkButton iconAfter={LinkExternalIcon} href={exampleHref} target="_blank">
                     View {issueKey}
-                </Link>
+                </LinkButton >
             </MenuList>
         </MenuSection>
 
