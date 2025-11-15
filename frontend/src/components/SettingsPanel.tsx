@@ -1,4 +1,4 @@
-import { useAppContext } from "../AppContext"
+import { useAppContext } from "../app/AppContext"
 import { Inline, Box } from '@atlaskit/primitives';
 import Heading from '@atlaskit/heading';
 import Button from '@atlaskit/button/new';

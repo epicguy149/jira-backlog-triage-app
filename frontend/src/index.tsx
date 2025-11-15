@@ -4,7 +4,7 @@ import { view } from '@forge/bridge';
 import AtlaskitAppProvider from '@atlaskit/app-provider';
 import '@atlaskit/css-reset';
 import App from './App';
-import { AppProvider } from './AppContext';
+import { AppProvider } from './app/AppContext';
 
 view.theme.enable();
 
