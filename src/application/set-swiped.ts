@@ -3,7 +3,7 @@ import {
   SetIssueSwipedResponse,
   SetIssueSwipedResponseSchema,
 } from '../../contracts/api';
-import { setIssueSwipedInStorage } from './swipe-storage';
+import { setIssueSwipedInStorage } from '../persistence/swipe-storage';
 
 type SetIssueSwipedContext = {
     accountId: string;

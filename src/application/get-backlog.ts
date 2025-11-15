@@ -5,7 +5,7 @@ import {
     SwipeIssuePageSchema
 } from '../../contracts/api'
 import { type JiraBacklogResponse, toSwipeIssue }  from './swipe-transformers';
-import { getSwipedSet } from './swipe-storage';
+import { getSwipedSet } from '../persistence/swipe-storage';
 import { buildJqlQuery } from './jql-builder';
 
 type GetBacklogContext = {
