@@ -4,6 +4,8 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
+    "@atlaskit/app-provider": "^3.2.5",
+    "@atlaskit/badge": "^18.2.4",
     "@atlaskit/banner": "^14.0.17",
     "@atlaskit/css": "^0.15.2",
     "@atlaskit/css-reset": "^6.16.0",
@@ -23,7 +25,6 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@atlaskit/app-provider": "^3.2.5",
     "@atlaskit/eslint-plugin-design-system": "^13.23.3",
     "@atlaskit/eslint-plugin-ui-styling-standard": "^1.4.5",
     "@atlaskit/stylelint-design-system": "^4.1.4",
@@ -35,14 +36,16 @@
     "@types/lodash": "^4.17.20",
     "@types/react": "^18.3.26",
     "@types/react-dom": "^18.3.7",
-    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "parcel": "^2.16.1",
     "stylelint": "^16.25.0",
     "typescript": "^5.9.3"
   },
   "scripts": {
     "start": "parcel index.html --dist-dir build --no-cache",
-    "build": "parcel build index.html --dist-dir build --no-cache"
+    "build": "parcel build index.html --dist-dir build --public-url ./",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src"
   },
   "browserslist": {
     "production": [
@@ -55,5 +58,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }
