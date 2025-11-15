@@ -58,10 +58,7 @@ export async function getBacklog(
 
     const data = (await res.json()) as JiraBacklogResponse;
 
-    // remove epics
-    const issues = data.issues.filter(
-      (issue) => issue.fields.issueType?.name?.toLowerCase() !== 'epic'
-    ) ?? [];
+    const issues = data.issues ?? [];
 
     // handle no issues post filter
     if (issues.length === 0) {

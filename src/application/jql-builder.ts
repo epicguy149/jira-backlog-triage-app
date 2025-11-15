@@ -12,7 +12,9 @@ type JqlBuilderOptions = {
 
 export function buildJqlQuery(options: JqlBuilderOptions): string | null {
     const { searchQuery, filters, swipedSet } = options;
-    const jqlClauses: string[] = [];
+    
+    // initial: filter out epics
+    const jqlClauses: string[] = ['issuetype != Epic'];
 
     if (searchQuery && searchQuery.trim() !== '') {
         jqlClauses.push(`text ~ "${escapeJQL(searchQuery)}"`);
