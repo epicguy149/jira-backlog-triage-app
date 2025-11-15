@@ -5,9 +5,6 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@compiled/react",
     "noEmit": true,
-    "paths": {
-      "~contracts/*": ["../contracts/*"]
-    }
   },
   "include": ["src"]
 }
