@@ -15,6 +15,7 @@ import SprintIcon from '@atlaskit/icon/core/sprint';
 import DeleteIcon from '@atlaskit/icon/core/delete';
 import { LinkButton } from '@atlaskit/button/new';
 import LinkExternalIcon from '@atlaskit/icon/core/link-external';
+import ToolTip from '@atlaskit/tooltip';
 
 const exampleHref = "http://www.bitbucket.com"
 
@@ -36,9 +37,12 @@ const ActionHistoryFlyout = ({ issueKey, type }: {issueKey: string, type: 'MOVED
         {/* link to issue */}
         <MenuSection>
             <MenuList>
-                <LinkButton iconAfter={LinkExternalIcon} href={exampleHref} target="_blank">
-                    View {issueKey}
-                </LinkButton >
+                <ToolTip content="Requires right click -> Open in new tab or middle mouse button to open in new tab">
+                    <LinkButton iconAfter={LinkExternalIcon} href={exampleHref} target="_blank">
+                        View {issueKey}
+                    </LinkButton >
+                </ToolTip>
+                
             </MenuList>
         </MenuSection>
 
