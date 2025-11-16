@@ -1,35 +1,55 @@
-import { Box, Inline, Stack, Text } from '@atlaskit/primitives';
-import { cssMap } from '@atlaskit/css';
+import { Inline, Stack, Text, Pressable } from '@atlaskit/primitives';
+import { cssMap, cx } from '@atlaskit/css';
 import { token } from '@atlaskit/tokens';
 import type { SwipeIssue } from '~contracts/api';
 import Lozenge from '@atlaskit/lozenge';
 import Heading from '@atlaskit/heading';
 import Avatar from '@atlaskit/avatar';
 
-// card style
 const styles = cssMap({
     card: {
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: token('elevation.surface.raised'),
-        boxShadow: token('elevation.shadow.raised'),
+        paddingBlockStart: token('space.200'),
+		paddingBlockEnd: token('space.300'),
+		paddingInline: token('space.200'),
+        backgroundColor: token('color.background.neutral.subtle'),
+        color: token('color.text'),
         borderRadius: token('radius.small'),
-        padding: token('space.200'),
-        transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
-        cursor: 'grab',
-    }
+        borderStyle: 'solid',
+        borderWidth: token('border.width'),
+        textAlign: 'left',
+        transition:
+			'transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out',
+		'&:hover': {
+			backgroundColor: token('color.background.neutral.hovered'),
+			boxShadow: token('elevation.shadow.overlay'),
+			transform: 'translateY(-2px)',
+		},
+        '&:active': {
+			transform: 'translateY(0)',
+			boxShadow: token('elevation.shadow.raised'),
+		}
+    },
+    selected: {
+		backgroundColor: token('color.background.selected'),
+		borderColor: token('color.border.selected'),
+		'&:hover': {
+			backgroundColor: token('color.background.selected.hovered'),
+		},
+	},
 })
 
 type Props = {
     issue: SwipeIssue;
+    isSelected?: boolean;
+    onClick?: (issue: SwipeIssue) => void;
 }
 
 function statusAppearance(
     status: string,
 ): React.ComponentProps<typeof Lozenge>['appearance'] {
-    const s = status.toLowerCase().trim();
-
-    // handle these todo, notstarted, done, closed, inprogress for now,
+    // handles to do, done, in progress for now,
     // if needed will add more
     if (status.includes('To Do')) {
         return 'default';
@@ -46,10 +66,18 @@ function statusAppearance(
 }
 
 // TODO: add epic + label(s)
-export function SwipeIssueCard({ issue }: Props) {
+export function SwipeIssueCard({ issue, isSelected, onClick }: Props) {
+    const handleClick = () => {
+		onClick?.(issue);
+	};
+
     return (
-        <Box xcss={styles.card}>
-            <Stack grow="fill">
+        <Pressable
+            type="button"
+            xcss={cx(styles.card, isSelected && styles.selected)}
+            onClick={handleClick}
+        >
+            <Stack space="space.150">
                 <Inline space="space.100" alignBlock='center'>
                     {issue.priorityIconUrl && (
                         <img
@@ -63,11 +91,11 @@ export function SwipeIssueCard({ issue }: Props) {
                         {issue.summary}
                     </Heading>
                 </Inline>
-                
+
                 <Text>
                     {issue.key}
                 </Text>
-                
+
                 <Inline space="space.100" alignBlock="center" spread="space-between">
                     <Lozenge appearance={statusAppearance(issue.status)} isBold>
                         {issue.status}
@@ -79,6 +107,6 @@ export function SwipeIssueCard({ issue }: Props) {
                     />
                 </Inline>
             </Stack>
-        </Box>
+        </Pressable>
     )
 }
