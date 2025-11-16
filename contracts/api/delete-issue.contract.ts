@@ -10,7 +10,8 @@ export const DeleteIssueRequestSchema = z.object({
 export type DelteIssueRequest = z.infer<typeof DeleteIssueRequestSchema>;
 
 export const DeleteIssueResponseSchema = z.object({
-    
+    issueIdOrKey: z.string(),
+    error: z.string().optional(),
 })
 
 export type DeleteIssueResponse = z.infer<typeof DeleteIssueResponseSchema>;
