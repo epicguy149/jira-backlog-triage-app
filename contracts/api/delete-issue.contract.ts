@@ -7,7 +7,7 @@ export const DeleteIssueRequestSchema = z.object({
     issueIdOrKey: z.string(),
 })
 
-export type DelteIssueRequest = z.infer<typeof DeleteIssueRequestSchema>;
+export type DeleteIssueRequest = z.infer<typeof DeleteIssueRequestSchema>;
 
 export const DeleteIssueResponseSchema = z.object({
     issueIdOrKey: z.string(),
