@@ -3,9 +3,9 @@ import Heading from '@atlaskit/heading';
 import { useAppContext } from '../../app/AppContext';
 import { useJiraContext } from '../../hooks/useJiraContext';
 import { fetchBacklog } from '../../api/jira-client';
-import { SwipeIssueCard } from '../swipe/components/SwipeIssueCard';
+import { SwipeIssueGrid } from '../swipe/components/SwipeIssueGrid';
 import { SwipeToolbar } from '../swipe/components/SwipeToolbar';
-import { cssMap } from '@compiled/react';
+import { cssMap } from '@atlaskit/css';
 import { token } from '@atlaskit/tokens';
 import { useEffect } from 'react';
 import Lozenge from '@atlaskit/lozenge';
@@ -15,24 +15,15 @@ import Spinner from '@atlaskit/spinner';
 const ISSUES_PER_PAGE = 20;
 
 const styles = cssMap({
-    container: {
-        padding: token('space.300'),
-    },
-    centered: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+	container: {
+		padding: token('space.300'),
+	},
+	centered: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
         minHeight: '200px',
-    },
-    cardGrid: {
-        gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-        alignItems: 'stretch',
-    },
-    skeletonCard: {
-        borderRadius: token('radius.small'),
-        backgroundColor: token('color.background.neutral.subtle'),
-        height: '120px',
-    },
+	},
 });
 
 function Message({ title, body}: { title: string, body?: string }) {
@@ -153,13 +144,7 @@ export default function SwipeMode() {
             return <Message title="Backlog clear" body="No issues in backlog for this board" />;
         }
 
-        return (
-            <Grid xcss={styles.cardGrid} gap="space.200">
-                {issuesToShow.map((issue) => (
-                    <SwipeIssueCard key={issue.id} issue={issue} />
-                ))}
-            </Grid>
-        );
+         return <SwipeIssueGrid issues={issuesToShow} />;
     };
 
     return (
