@@ -48,6 +48,8 @@ permissions:
     - storage:app
     - read:board-scope:jira-software
     - read:issue-details:jira
+    - write:sprint:jira-software
+    
   content:
     scripts:
       - unsafe-inline
