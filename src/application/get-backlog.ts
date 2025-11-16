@@ -58,7 +58,10 @@ export async function getBacklog(
 
     const data = (await res.json()) as JiraBacklogResponse;
 
-    const issues = data.issues ?? [];
+    // local filter, JQL filter for epic doenst seem to work (will fix)
+    const issues = data.issues.filter(
+        (issue) => issue.fields.issuetype?.name?.toLowerCase() !== 'epic'
+    ) ?? [];
 
     // handle no issues post filter
     if (issues.length === 0) {

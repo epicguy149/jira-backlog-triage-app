@@ -22,6 +22,7 @@ export const SwipeIssueSchema = z.object({
     assigneeDisplayName: z.string().nullable(),
     assigneeAvatarUrl: z.string().nullable(),
     issueTypeName: z.string().nullable(),
+    issueTypeIconUrl: z.string().nullable(),
 
     // for future use
     description: z.string().nullable(),

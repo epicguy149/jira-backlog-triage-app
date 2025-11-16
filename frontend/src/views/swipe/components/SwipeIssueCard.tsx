@@ -5,6 +5,7 @@ import type { SwipeIssue } from '~contracts/api';
 import Lozenge from '@atlaskit/lozenge';
 import Heading from '@atlaskit/heading';
 import Avatar from '@atlaskit/avatar';
+import Tooltip from '@atlaskit/tooltip';
 
 const styles = cssMap({
     card: {
@@ -13,11 +14,11 @@ const styles = cssMap({
         paddingBlockStart: token('space.200'),
 		paddingBlockEnd: token('space.300'),
 		paddingInline: token('space.200'),
-        backgroundColor: token('color.background.neutral.subtle'),
+        backgroundColor: token('color.background.information'),
         color: token('color.text'),
-        borderRadius: token('radius.small'),
-        borderStyle: 'solid',
-        borderWidth: token('border.width'),
+        borderRadius: token('radius.large'),
+        borderColor: token('color.border.accent.blue'),
+        boxShadow: token('elevation.shadow.raised'),
         textAlign: 'left',
         transition:
 			'transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out',
@@ -78,18 +79,29 @@ export function SwipeIssueCard({ issue, isSelected, onClick }: Props) {
             onClick={handleClick}
         >
             <Stack space="space.150">
-                <Inline space="space.100" alignBlock='center'>
-                    {issue.priorityIconUrl && (
+                <Inline space="space.100" alignBlock="center" spread="space-between">
+                    <Inline space="space.100" alignBlock='center'>
+                        {issue.priorityIconUrl && (
+                            <img
+                            src={issue.priorityIconUrl}
+                            alt=""
+                            width={16}
+                            height={16}
+                            />
+                        )}
+                        <Heading size="medium">
+                            {issue.summary}
+                        </Heading>
+                    </Inline>
+
+                    {issue.issueTypeIconUrl && (
                         <img
-                        src={issue.priorityIconUrl}
+                        src={issue.issueTypeIconUrl}
                         alt=""
                         width={16}
                         height={16}
                         />
                     )}
-                    <Heading size="medium">
-                        {issue.summary}
-                    </Heading>
                 </Inline>
 
                 <Text>
@@ -100,11 +112,13 @@ export function SwipeIssueCard({ issue, isSelected, onClick }: Props) {
                     <Lozenge appearance={statusAppearance(issue.status)} isBold>
                         {issue.status}
                     </Lozenge>
-                    <Avatar
-                        size="small"
-                        src={issue.assigneeAvatarUrl ?? undefined}
-                        name={issue.assigneeDisplayName ?? 'Unassigned'}
-                    />
+                    <Tooltip content={issue.assigneeDisplayName}>
+                        <Avatar
+                            size="small"
+                            src={issue.assigneeAvatarUrl ?? undefined}
+                            name={issue.assigneeDisplayName ?? 'Unassigned'}
+                        />
+                    </Tooltip>
                 </Inline>
             </Stack>
         </Pressable>
