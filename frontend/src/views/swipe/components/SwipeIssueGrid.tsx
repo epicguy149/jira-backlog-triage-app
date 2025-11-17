@@ -1,7 +1,16 @@
 import { Grid } from '@atlaskit/primitives';
 import type { SwipeIssue } from '~contracts/api';
-
+import { cssMap } from '@atlaskit/css';
+import { token } from '@atlaskit/tokens';
 import { SwipeIssueCard } from './SwipeIssueCard';
+
+const styles = cssMap({
+	grid: {
+		backgroundColor: token('color.background.accent.gray.subtlest'),
+		paddingBlock: token('space.150'),
+    	paddingInline: token('space.150'),
+	}
+})
 
 type Props = {
 	issues: SwipeIssue[];
@@ -17,8 +26,9 @@ export function SwipeIssueGrid({
 
 	return (
 		<Grid
-			gap="space.200"
+			gap="space.150"
 			templateColumns="repeat(auto-fill, minmax(260px, 1fr))"
+			xcss={styles.grid}
 		>
 			{issues.map((issue) => (
 				<SwipeIssueCard
