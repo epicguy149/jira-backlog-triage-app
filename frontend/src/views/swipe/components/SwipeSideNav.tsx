@@ -20,29 +20,18 @@ import type { SwipeActionType } from '../swipe-types';
 import { useAppContext } from 'frontend/src/app/AppContext';
 import { Box, Text } from '@atlaskit/primitives';
 
-function getActionMessage(type: SwipeActionType, sprintName?: string): string {
+function getActionMessage(type: SwipeActionType, key: string, sprintName?: string): string {
     switch(type) {
         case 'delete':
-            return 'deleted';
+            return `${key} deleted`;
         case 'retain':
-            return 'retained in backlog';
+            return `${key} retained in backlog`;
         case 'move-to-sprint':
-            return `moved to ${sprintName}`;
+            return `${key} moved to ${sprintName}`;
         default:
             return 'no action - bug';
     }
 }
-
-/**
- * 
- * In real app, take props to determine which actions/issues to show
- * 
- * refer: https://community.atlassian.com/forums/Jira-questions/How-can-I-get-an-issue-url-that-can-be-navigated-to-in-the/qaq-p/1500948
- * for getting jira issue link
- * 
- * for each action made by user, add menu item e.g.: PROJ-12 (href = issuelinkfromabove) flyout -> UNDO + other actions
- * also fetch latest sprint, for moved to actions
- */
 
 type ActionHistoryFlyoutProps = {
   issueKey: string;
@@ -51,7 +40,9 @@ type ActionHistoryFlyoutProps = {
 
 
 const ActionHistoryFlyout = ({ issueKey, type }: ActionHistoryFlyoutProps) => {
-    const issueHref = `/browse/${issueKey}`; 
+    const { jiraBaseUrl } = useAppContext();
+    const issueHref = `${jiraBaseUrl}/browse/${issueKey}`;
+        
 
     return (
         <FlyoutMenuItemContent>
@@ -118,9 +109,9 @@ export default function SwipeSideNav() {
                 ) : (
                     <MenuList>
                         {actionHistory.map(item => (
-                            <FlyoutMenuItem key={item.key}>
+                            <FlyoutMenuItem key={item.id}>
                                 <FlyoutMenuItemTrigger>
-                                    {getActionMessage(item.type, item.sprintName)}
+                                    {getActionMessage(item.type, item.key, item.sprintName)}
                                 </FlyoutMenuItemTrigger>
                                 <ActionHistoryFlyout issueKey={item.key} type={item.type} />
                             </FlyoutMenuItem>
