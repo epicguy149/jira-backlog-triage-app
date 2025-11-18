@@ -42,7 +42,6 @@ type ActionHistoryFlyoutProps = {
 const ActionHistoryFlyout = ({ issueKey, type }: ActionHistoryFlyoutProps) => {
     const { jiraBaseUrl } = useAppContext();
     const issueHref = `${jiraBaseUrl}/browse/${issueKey}`;
-        
 
     return (
         <FlyoutMenuItemContent>
