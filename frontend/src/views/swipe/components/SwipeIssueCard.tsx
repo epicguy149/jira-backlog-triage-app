@@ -1,7 +1,4 @@
-import { Inline, Stack, Text, Pressable, Box } from '@atlaskit/primitives';
-import { cssMap, cx } from '@atlaskit/css';
-import { token } from '@atlaskit/tokens';
-import type { SwipeIssue } from '~contracts/api';
+import React from 'react';
 import Lozenge from '@atlaskit/lozenge';
 import Avatar from '@atlaskit/avatar';
 import Tooltip from '@atlaskit/tooltip';
@@ -9,11 +6,14 @@ import Badge from '@atlaskit/badge';
 import SprintIcon from '@atlaskit/icon/core/sprint';
 import DeleteIcon from '@atlaskit/icon/core/delete';
 import BacklogIcon from '@atlaskit/icon/core/backlog';
+import Link from '@atlaskit/link';
+import { Inline, Stack, Text, Pressable, Box } from '@atlaskit/primitives';
+import { cssMap, cx } from '@atlaskit/css';
+import { token } from '@atlaskit/tokens';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import type { SwipeDirection } from '../swipe-types';
-import Link from '@atlaskit/link';
+import type { SwipeIssue } from '~contracts/api';
 import { useAppContext } from 'frontend/src/app/AppContext';
-import React from 'react';
 
 const MotionPressable = motion(Pressable);
 
@@ -74,7 +74,7 @@ type Props = {
     issue: SwipeIssue;
     isSelected?: boolean;
     onClick?: (issue: SwipeIssue) => void;
-    onSwipe?: (issue: SwipeIssue, direction: SwipeDirection) => void;
+    onSwipe?: (issue: SwipeIssue, direction: SwipeDirection) => Promise<boolean> | boolean;
     isSwiping?: boolean;
 }
 
@@ -149,7 +149,11 @@ function computeVelocityDirection(vx: number, vy: number): SwipeDirection | null
 }
 
 export function SwipeIssueCard({ 
-    issue, isSelected, onClick, onSwipe, isSwiping,
+    issue,
+    isSelected,
+    onClick,
+    onSwipe,
+    isSwiping,
 }: Props) {
     const controls = useAnimation();
     const [activeDirection, setActiveDirection] = React.useState<SwipeDirection | null>(null);
@@ -210,6 +214,7 @@ export function SwipeIssueCard({
                 targetY = -FLY_OUT_DISTANCE;
         }
 
+        // fly card out 
         await controls.start({
             x: targetX,
             y: targetY,
@@ -218,13 +223,30 @@ export function SwipeIssueCard({
             transition: { duration: 0.25, ease: 'easeOut' },
         });
 
-        onSwipe?.(issue, finalDirection);
+        let success = true;
+        
+        if (onSwipe) {
+			try {
+				const result = await onSwipe(issue, finalDirection);
+				if (result === false) {
+					success = false;
+				}
+			} catch {
+				success = false;
+			}
+		}
 
-        console.log(`${issueKey} swiped ${finalDirection}`);
+        if (!success) {
+			await controls.start({
+				x: 0,
+				y: 0,
+				rotate: 0,
+				opacity: 1,
+				transition: { type: 'spring', stiffness: 400, damping: 30 },
+			});
+		}
 
-        // reset
-        controls.set({ x: 0, y: 0, rotate: 0, opacity: 1 });
-        setActiveDirection(null);
+		setActiveDirection(null);
     };
     
     const handleClick = () => {
