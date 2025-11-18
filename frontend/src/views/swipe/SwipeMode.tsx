@@ -10,9 +10,18 @@ import { token } from '@atlaskit/tokens';
 import { useEffect } from 'react';
 import Lozenge from '@atlaskit/lozenge';
 import Spinner from '@atlaskit/spinner';
+import EmptyState from '@atlaskit/empty-state';
+import noResultsImg from './images/no-results.png';
+import emptyBacklogImg from './images/empty-backlog.png';
+import errorImg from './images/error.png';
+import { Fragment } from 'react';
 
 // maxResults value
 const ISSUES_PER_PAGE = 20;
+
+type ErrorStateProps = {
+  message?: string;
+};
 
 const styles = cssMap({
 	container: {
@@ -26,16 +35,47 @@ const styles = cssMap({
 	},
 });
 
-function Message({ title, body}: { title: string, body?: string }) {
-    return (
-        <Box xcss={styles.centered}>
-            <Stack space="space.100" alignInline='center'>
-                <Heading size="large">{title}</Heading>
-                {body && <Text>{body}</Text>}
-            </Stack>
-        </Box>
-    )
-}
+const NoResultsState = () => (
+    <EmptyState
+		header="No results found"
+		description={
+			<Fragment>
+				Try using different filters or a different search term.
+			</Fragment>
+		}
+		imageUrl={noResultsImg}
+		imageHeight={146.5}
+		imageWidth={160}
+	/>
+);
+
+const EmptyBacklogState = () => (
+    <EmptyState
+		header="Backlog empty"
+		description={
+			<Fragment>
+				All clear! There are no issues in the backlog.
+			</Fragment>
+		}
+		imageUrl={emptyBacklogImg}
+		imageHeight={146.5}
+		imageWidth={160}
+	/>
+);
+
+const ErrorState = ({ message }: ErrorStateProps) => (
+    <EmptyState
+		header="Error"
+		description={
+			<Fragment>
+				{message || 'An error has occured, please refresh the page and try again.'}
+			</Fragment>
+		}
+		imageUrl={errorImg}
+		imageHeight={146.5}
+		imageWidth={160}
+	/>
+);
 
 export default function SwipeMode() {
     const {
@@ -125,30 +165,31 @@ export default function SwipeMode() {
 
     const renderGrid = () => {
         if (swipeError) {
-            return <Message title="Could not load backlog issues" body={swipeError} />;
+            return <ErrorState message={swipeError} />;
         }
 
         if (isSwipeLoading && !swipePage) {
             return (
-                <Box xcss={styles.centered}>
+                <Stack xcss={styles.centered}>
                     <Spinner size="large" label='Loading issues...' />
-                </Box>
+                    <Text size="large">Loading issues...</Text>
+                </Stack>
             );
         }
 
         if (issuesToShow.length === 0) {
             if (searchQuery || swipeFilters.status.swiped || !swipeFilters.status.unswiped) {
-                return <Message title="No matching issues" body="No issues match your search and filters" />;
+                return <NoResultsState />;
             }
 
-            return <Message title="Backlog clear" body="No issues in backlog for this board" />;
+            return <EmptyBacklogState />;
         }
 
          return <SwipeIssueGrid issues={issuesToShow} />;
     };
 
     return (
-        <Stack space="space.300" xcss={styles.container}>
+        <Stack space="space.150" xcss={styles.container}>
             <SwipeToolbar />
             {renderGrid()}
         </Stack>
