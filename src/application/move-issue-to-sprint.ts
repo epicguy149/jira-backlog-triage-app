@@ -12,8 +12,8 @@ type JiraSprint = {
 }
 
 type JiraSprintList = {
-    sprints?: JiraSprint[];
-}
+    values?: JiraSprint[]; 
+};
 
 export async function moveIssueToSprint(
     payload: MoveIssueToSprintRequest
@@ -27,15 +27,17 @@ export async function moveIssueToSprint(
 
         const getSprintsData = (await getSprintsRes.json()) as JiraSprintList;
 
-        if (!getSprintsRes.ok || !getSprintsData.sprints?.length) {
-            return MoveIssueToSprintResponseSchema.parse({
-                issueIdOrKey,
-                error: 'no active sprint found',
-            });
+        const sprints = getSprintsData.values ?? [];
+
+        if (!getSprintsRes.ok || sprints.length === 0) {
+        return MoveIssueToSprintResponseSchema.parse({
+            issueIdOrKey,
+            error: 'no active sprint found',
+        });
         }
 
         // first active sprint
-        const sprint = getSprintsData.sprints[0];
+        const sprint = sprints[0];
         const sprintId = sprint.id;
 
         var bodyData = JSON.stringify({ issues: [issueIdOrKey] });
