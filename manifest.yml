@@ -49,6 +49,7 @@ permissions:
     - read:board-scope:jira-software
     - read:issue-details:jira
     - write:sprint:jira-software
+    - read:sprint:jira-software
     
   content:
     scripts:
