@@ -30,10 +30,10 @@ export async function moveIssueToSprint(
         const sprints = getSprintsData.values ?? [];
 
         if (!getSprintsRes.ok || sprints.length === 0) {
-        return MoveIssueToSprintResponseSchema.parse({
-            issueIdOrKey,
-            error: 'no active sprint found',
-        });
+            return MoveIssueToSprintResponseSchema.parse({
+                issueIdOrKey,
+                error: 'no active sprint found',
+            });
         }
 
         // first active sprint
