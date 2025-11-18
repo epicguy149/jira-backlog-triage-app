@@ -3,6 +3,7 @@ import type { SwipeIssue } from '~contracts/api';
 import { cssMap } from '@atlaskit/css';
 import { token } from '@atlaskit/tokens';
 import { SwipeIssueCard } from './SwipeIssueCard';
+import type { SwipeDirection } from '../swipe-types';
 
 const styles = cssMap({
 	grid: {
@@ -16,12 +17,17 @@ type Props = {
 	issues: SwipeIssue[];
 	selectedIssueId?: string | null;
 	onIssueClick?: (issue: SwipeIssue) => void;
+	onIssueSwipe?: (
+		issue: SwipeIssue,
+		direction: SwipeDirection,
+	) => Promise<boolean> | boolean;
 };
 
 export function SwipeIssueGrid({
 	issues,
 	selectedIssueId,
 	onIssueClick,
+	onIssueSwipe,
 }: Props) {
 
 	return (
@@ -36,6 +42,7 @@ export function SwipeIssueGrid({
 					issue={issue}
 					isSelected={selectedIssueId === issue.id}
 					onClick={onIssueClick}
+					onSwipe={onIssueSwipe}
 				/>
 			))}
 		</Grid>
