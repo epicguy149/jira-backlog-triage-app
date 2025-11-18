@@ -11,6 +11,8 @@ import type {
     DeleteIssueResponse,
     MoveIssueToSprintRequest,
     MoveIssueToSprintResponse,
+    MoveIssueToBacklogRequest,
+    MoveIssueToBacklogResponse
 } from '~contracts/api';
 
 type FetchBacklogParams = Omit<GetBacklogRequest, 'boardId'> & {
@@ -44,6 +46,12 @@ export async function moveIssueToSprint(
   params: MoveIssueToSprintRequest,
 ): Promise<MoveIssueToSprintResponse> {
   return invoke('moveIssueToSprint', params) as Promise<MoveIssueToSprintResponse>;
+}
+
+export async function moveIssueToBacklog(
+  params: MoveIssueToBacklogRequest,
+): Promise<MoveIssueToBacklogResponse> {
+  return invoke('moveIssueToBacklog', params) as Promise<MoveIssueToBacklogResponse>;
 }
 
 export async function fetchServerInfo(): Promise<ServerInfo> {
