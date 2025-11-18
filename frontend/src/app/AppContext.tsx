@@ -56,6 +56,9 @@ interface IAppContext {
     // history / undo 
     actionHistory: ActionHistoryItem[];
     addActionHistory: (item: Omit<ActionHistoryItem, 'id' | 'timestamp'>) => void;
+
+    jiraBaseUrl: string | null;
+    setJiraBaseUrl: (url: string | null) => void;
 }
 
 const AppContext = createContext<IAppContext | undefined>(undefined);
@@ -75,6 +78,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // for action history item id
     const [nextHistoryId, setNextHistoryId] = useState(1);
     const [actionHistory, setActionHistory] = useState<ActionHistoryItem[]>([]);
+
+    const [jiraBaseUrl, setJiraBaseUrl] = useState<string | null>(null);
 
     const addActionHistory = (item: Omit<ActionHistoryItem, 'id' | 'timestamp'>) => {
         setActionHistory((prev) => {
@@ -113,7 +118,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         nextHistoryId,
         setNextHistoryId,
         actionHistory,
-        addActionHistory
+        addActionHistory,
+        jiraBaseUrl,
+        setJiraBaseUrl,
     };
 
     return (

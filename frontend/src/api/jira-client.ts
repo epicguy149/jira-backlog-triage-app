@@ -1,6 +1,6 @@
 // file for Jira api calls
 
-import { invoke } from '@forge/bridge';
+import { invoke, requestJira } from '@forge/bridge';
 import type { 
     GetBacklogRequest, 
     GetBacklogResponse,
@@ -12,6 +12,15 @@ import type {
     MoveIssueToSprintRequest,
     MoveIssueToSprintResponse,
 } from '~contracts/api';
+
+type FetchBacklogParams = Omit<GetBacklogRequest, 'boardId'> & {
+    boardId: string | number;
+    filters?: SwipeFilterState;
+};
+
+export type ServerInfo = {
+  baseUrl: string;
+};
 
 export async function fetchBacklog(
     params: GetBacklogRequest
@@ -37,7 +46,21 @@ export async function moveIssueToSprint(
   return invoke('moveIssueToSprint', params) as Promise<MoveIssueToSprintResponse>;
 }
 
-type FetchBacklogParams = Omit<GetBacklogRequest, 'boardId'> & {
-    boardId: string | number;
-    filters?: SwipeFilterState;
-};
+export async function fetchServerInfo(): Promise<ServerInfo> {
+  const res = await requestJira(`/rest/api/3/serverInfo`, {
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`failed to fetch serverInfo: ${res.status} ${text}`);
+  }
+
+  const data = await res.json() as any;
+
+  return {
+    baseUrl: data.baseUrl,
+  };
+}
