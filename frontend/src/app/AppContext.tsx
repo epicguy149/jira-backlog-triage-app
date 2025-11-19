@@ -16,8 +16,20 @@ export type View = 'loading' | 'swipe' | 'matrix';
 
 // appearance types
 export type Banner = 
-    | { message: string; type: 'warning' | 'error' | 'announcement' } 
+    | { 
+        message: string; 
+        type: 'warning' | 'error' | 'announcement';
+        undoHistoryId?: string | null;
+    } 
     | null;
+
+// actions possible for each item in history
+type HistoryOp = 'undo' | 'move-to-sprint' | 'delete';
+
+type HistoryActionRequest = {
+  item: ActionHistoryItem;
+  op: HistoryOp;
+};
 
 export const filtersInitialState: SwipeFilterState = {
     status: {
@@ -55,7 +67,13 @@ interface IAppContext {
 
     // history / undo 
     actionHistory: ActionHistoryItem[];
-    addActionHistory: (item: Omit<ActionHistoryItem, 'id' | 'timestamp'>) => void;
+    addActionHistory: (
+        item: Omit<ActionHistoryItem, 'id' | 'timestamp'>,
+    ) => ActionHistoryItem;
+    disableHistoryItem: (id: string) => void;
+
+    historyActionRequest: HistoryActionRequest | null;
+    setHistoryActionRequest: (req: HistoryActionRequest | null) => void;
 
     jiraBaseUrl: string | null;
     setJiraBaseUrl: (url: string | null) => void;
@@ -81,21 +99,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const [jiraBaseUrl, setJiraBaseUrl] = useState<string | null>(null);
 
-    const addActionHistory = (item: Omit<ActionHistoryItem, 'id' | 'timestamp'>) => {
-        setActionHistory((prev) => {
-            // KEY-id
-            const id = `${item.key}-${nextHistoryId}`;
-            const full: ActionHistoryItem = {
-                ...item,
-                id,
-                timestamp: Date.now(),
-            };
+    const [historyActionRequest, setHistoryActionRequest] = useState<HistoryActionRequest | null>(null);
 
+    const addActionHistory = (item: Omit<ActionHistoryItem, 'id' | 'timestamp'>) => {
+        const id = `${item.key}-${nextHistoryId}`;
+        const full: ActionHistoryItem = {
+            ...item,
+            id,
+            timestamp: Date.now(),
+        };
+
+        setActionHistory((prev) => {
             const next = [full, ...prev];
             return next.slice(0, MAX_HISTORY_COUNT);
         });
 
         setNextHistoryId((n) => n + 1);
+        return full;
+    };
+
+    const disableHistoryItem = (id: string) => {
+        setActionHistory((prev) =>
+            prev.map((it) => (it.id === id ? { ...it, disabled: true } : it)),
+        );
     };
 
     const value = {
@@ -115,12 +141,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSearchQuery,
         swipeFilters,
         setSwipeFilters,
-        nextHistoryId,
-        setNextHistoryId,
         actionHistory,
         addActionHistory,
         jiraBaseUrl,
         setJiraBaseUrl,
+        historyActionRequest,
+        setHistoryActionRequest,
+        disableHistoryItem,
     };
 
     return (
