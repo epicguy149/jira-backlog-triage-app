@@ -16,11 +16,12 @@ import { useEffect, useCallback, Fragment } from 'react';
 import Lozenge from '@atlaskit/lozenge';
 import Spinner from '@atlaskit/spinner';
 import EmptyState from '@atlaskit/empty-state';
-import noResultsImg from './images/no-results.png';
-import emptyBacklogImg from './images/empty-backlog.png';
-import errorImg from './images/error.png';
 import type { SwipeIssue } from '~contracts/api';
 import type { SwipeDirection } from '../swipe/swipe-types';
+
+const noResultsImg = new URL('./images/no-results.png', import.meta.url).href;
+const emptyBacklogImg = new URL('./images/empty-backlog.png', import.meta.url).href;
+const errorImg = new URL('./images/error.png', import.meta.url).href;
 
 // maxResults value
 const ISSUES_PER_PAGE = 20;

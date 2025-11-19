@@ -2,7 +2,6 @@
   "name": "jira-backlog-action-custom-ui-static",
   "version": "0.1.54",
   "private": true,
-  "homepage": ".",
   "dependencies": {
     "@atlaskit/app-provider": "^3.2.5",
     "@atlaskit/badge": "^18.2.4",
@@ -46,7 +45,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "start": "parcel index.html --dist-dir build --no-cache",
+    "start": "parcel index.html --dist-dir build --public-url ./ --no-cache",
     "build": "parcel build index.html --dist-dir build --public-url ./",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src"
   },
