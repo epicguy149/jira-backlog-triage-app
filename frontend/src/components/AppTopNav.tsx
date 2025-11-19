@@ -57,12 +57,12 @@ export default React.memo(function AppTopNav() {
                 <AppLogo
 					href="https://jira.atlassian.com"
 					icon={JiraIcon}
-					name="Jira"
+					name="Log Juggler"
 					label="App name"
 				/>
                 
                 {/* ADS beta feature - doesn't work*/}
-                <CustomTitle>Log Juggler</CustomTitle>
+                {/* <CustomTitle>Log Juggler</CustomTitle> */}
                 
                 <TopNavButton iconBefore={ChangesIcon} onClick={() => changeView('swipe')}>Swipe</TopNavButton>
 
