@@ -508,7 +508,7 @@ export default function SwipeMode() {
             return <ErrorState message={swipeError} />;
         }
 
-        if (isSwipeLoading && !swipePage) {
+        if (isSwipeLoading && (!swipePage || issuesToShow.length === 0)) {
             return (
                 <Stack xcss={styles.centered}>
                     <Spinner size="large" label='Loading issues...' />
