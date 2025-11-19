@@ -34,6 +34,20 @@ const styles = cssMap({
 		justifyContent: 'center',
 		minHeight: '200px',
 	},
+	layout: {
+		display: 'flex',
+		gap: token('space.300'),
+		alignItems: 'flex-start',
+		flexWrap: 'wrap',
+	},
+	benchColumn: {
+		flex: '0 0 320px',
+		minWidth: '260px',
+	},
+	gridColumn: {
+		flex: '1 1 0%',
+		minWidth: '320px',
+	},
 });
 
 type MessageProps = {
@@ -250,16 +264,20 @@ export default function MatrixMode() {
 		}
 
 		return (
-			<Stack space="space.400">
-				<MatrixBench issues={benchIssues} />
-				<MatrixGrid
-					gridSize={GRID_SIZE}
-					impactScale={IMPACT_SCALE}
-					effortScale={EFFORT_SCALE}
-					issues={issues}
-					placements={placements}
-				/>
-			</Stack>
+			<Box xcss={styles.layout}>
+				<Box xcss={styles.benchColumn}>
+					<MatrixBench issues={benchIssues} />
+				</Box>
+				<Box xcss={styles.gridColumn}>
+					<MatrixGrid
+						gridSize={GRID_SIZE}
+						impactScale={IMPACT_SCALE}
+						effortScale={EFFORT_SCALE}
+						issues={issues}
+						placements={placements}
+					/>
+				</Box>
+			</Box>
 		);
 	};
 
