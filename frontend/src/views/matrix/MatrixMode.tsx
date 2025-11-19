@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Heading from '@atlaskit/heading';
 import Lozenge from '@atlaskit/lozenge';
 import { cssMap } from '@atlaskit/css';
-import { Box, Inline, Stack, Text } from '@atlaskit/primitives';
+import { Box, Stack, Text } from '@atlaskit/primitives';
 import Spinner from '@atlaskit/spinner';
 import { token } from '@atlaskit/tokens';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
@@ -21,8 +21,6 @@ import {
 } from './components/types';
 
 const GRID_SIZE = 4;
-const IMPACT_SCALE = ['Low impact', 'Consider', 'High impact', 'Strategic bet'];
-const EFFORT_SCALE = ['Low effort', 'Manageable', 'High effort', 'Significant lift'];
 
 const styles = cssMap({
 	container: {
@@ -38,15 +36,16 @@ const styles = cssMap({
 		display: 'flex',
 		gap: token('space.300'),
 		alignItems: 'flex-start',
-		flexWrap: 'wrap',
+		flexWrap: 'nowrap',
 	},
 	benchColumn: {
 		flex: '0 0 320px',
 		minWidth: '260px',
+		flexShrink: 0,
 	},
 	gridColumn: {
-		flex: '1 1 0%',
-		minWidth: '320px',
+		flex: '1 1 auto',
+		minWidth: '400px',
 	},
 });
 
@@ -66,6 +65,7 @@ function Message({ title, body }: MessageProps) {
 	);
 }
 
+// borrowed from swipe mode
 export default function MatrixMode() {
 	const {
 		swipePage,
@@ -81,6 +81,7 @@ export default function MatrixMode() {
 
 	const [placements, setPlacements] = useState<PlacementMap>({});
 
+	// initial load I stole from Swipe mode,  fetches the first page of backlog issues
 	useEffect(() => {
 		if (contextError) {
 			setSwipeError(contextError);
@@ -93,7 +94,10 @@ export default function MatrixMode() {
 
 		let cancelled = false;
 
+
+		// this shit was from swipe
 		async function loadMatrixData() {
+
 			try {
 				setSwipeError(null);
 				setIsSwipeLoading(true);
@@ -106,21 +110,24 @@ export default function MatrixMode() {
 				});
 				if (!cancelled) {
 					setSwipePage(page);
-				}
-			} catch (err: unknown) {
+				} 
+			} catch (err: unknown) { 
 				if (!cancelled) {
 					const message =
-						err instanceof Error ? err.message : 'Unable to load backlog issues for the matrix.';
-					setSwipeError(message);
+						err instanceof Error ? err.message : 'Couldnt load backlog issues for the matrix.';   
+					setSwipeError(message); 
 				}
+
 			} finally {
 				if (!cancelled) {
 					setIsSwipeLoading(false);
-				}
+				} 
 			}
+
 		}
 
 		void loadMatrixData();
+
 		return () => {
 			cancelled = true;
 		};
@@ -137,7 +144,9 @@ export default function MatrixMode() {
 
 	const issues = swipePage?.issues ?? [];
 
+	// whenever the page of issues changes ensure each issue has a placement entry
 	useEffect(() => {
+
 		if (issues.length === 0) {
 			setPlacements({});
 			return;
@@ -152,10 +161,12 @@ export default function MatrixMode() {
 				issueIds.add(issue.id);
 				if (prev[issue.id]) {
 					next[issue.id] = prev[issue.id];
+
 				} else {
 					next[issue.id] = { type: 'bench' };
 					changed = true;
 				}
+
 			}
 
 			for (const issueId of Object.keys(prev)) {
@@ -172,8 +183,9 @@ export default function MatrixMode() {
 		});
 	}, [issues]);
 
+	// attach global drop monitoring so cards update placements when moved 
 	useEffect(() => {
-		return monitorForElements({
+		return monitorForElements({ 
 			onDrop({ source, location }) {
 				if (!isMatrixIssueDragData(source.data)) {
 					return;
@@ -184,16 +196,17 @@ export default function MatrixMode() {
 					return;
 				}
 
-				const dropData = destination.data;
+				const dropData = destination.data; 
 
 				if (isMatrixCellDropData(dropData)) {
-					setPlacements((prev) => {
+
+					setPlacements((prev) => { 
 						const prevPlacement = prev[source.data.issueId];
 						if (
 							prevPlacement &&
 							prevPlacement.type === 'grid' &&
 							prevPlacement.coord.row === dropData.coord.row &&
-							prevPlacement.coord.col === dropData.coord.col
+							prevPlacement.coord.col === dropData.coord.col 
 						) {
 							return prev;
 						}
@@ -206,10 +219,11 @@ export default function MatrixMode() {
 							...prev,
 							[source.data.issueId]: {
 								type: 'grid',
-								coord: { row: dropData.coord.row, col: dropData.coord.col },
+								coord: { row: dropData.coord.row, col: dropData.coord.col }, 
 							},
 						};
 					});
+
 					return;
 				}
 
@@ -223,6 +237,7 @@ export default function MatrixMode() {
 						return {
 							...prev,
 							[source.data.issueId]: { type: 'bench' },
+
 						};
 					});
 				}
@@ -246,15 +261,18 @@ export default function MatrixMode() {
 		);
 	}
 
-	const renderMatrixContents = () => {
+	// renderMatrixConetnts
+	// this handles all states (error/loading/data) for matrix mode
+	// 
+	const renderMatrixContents = () => { 
 		if (swipeError) {
 			return <Message title="Could not load backlog issues" body={swipeError} />;
 		}
-
 		if (isSwipeLoading && issues.length === 0) {
 			return (
 				<Box xcss={styles.centered}>
 					<Spinner size="large" label="Loading issues..." />
+
 				</Box>
 			);
 		}
@@ -269,34 +287,29 @@ export default function MatrixMode() {
 					<MatrixBench issues={benchIssues} />
 				</Box>
 				<Box xcss={styles.gridColumn}>
-					<MatrixGrid
-						gridSize={GRID_SIZE}
-						impactScale={IMPACT_SCALE}
-						effortScale={EFFORT_SCALE}
-						issues={issues}
-						placements={placements}
-					/>
+					<MatrixGrid gridSize={GRID_SIZE} issues={issues} placements={placements} />
 				</Box>
 			</Box>
 		);
 	};
 
 	return (
+
+		// actual render
 		<Stack space="space.300" xcss={styles.container}>
+
 			<Stack space="space.050">
 				<Heading as="h1" size="large">
 					Matrix Mode
 				</Heading>
 				<Text tone="subtle">
-					Bench your backlog cards, then drag them across the grid to reason about impact versus effort.
+					Drag backlog items onto the grid to assign them an impact vs. effort score.
 				</Text>
-				<Inline space="space.150" alignBlock="center">
-					<Text size="small" tone="subtle">
-						Impact increases from left to right, effort increases from top to bottom.
-					</Text>
-				</Inline>
 			</Stack>
+
 			{renderMatrixContents()}
+
 		</Stack>
+
 	);
 }

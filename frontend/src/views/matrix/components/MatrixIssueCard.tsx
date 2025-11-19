@@ -58,10 +58,10 @@ function statusAppearance(status: string): React.ComponentProps<typeof Lozenge>[
 	return 'default';
 }
 
-/**
- * MatrixIssueCard renders a draggable tile using Atlassian primitives.
- * Cards describe the issue and expose their metadata to the drag monitor.
- */
+	/**
+	 * Renders a draggable tile using atlassian primitives.
+	 * Cards describe the issue and expose their metadata to the drag monitor.
+	 */
 export function MatrixIssueCard({ issue, location }: MatrixIssueCardProps) {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
@@ -75,6 +75,7 @@ export function MatrixIssueCard({ issue, location }: MatrixIssueCardProps) {
 		[location.type, gridRow, gridCol],
 	);
 
+	// connect the card to pragmatic drag-and-drop so layouts get coordinate metadata
 	useEffect(() => {
 		const element = ref.current;
 		invariant(element, 'MatrixIssueCard expects a ref element');
