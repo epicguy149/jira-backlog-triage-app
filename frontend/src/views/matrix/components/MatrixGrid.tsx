@@ -1,8 +1,8 @@
-import { Fragment, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 import Heading from '@atlaskit/heading';
 import { cssMap, cx } from '@atlaskit/css';
-import { Box, Grid, Stack, Text } from '@atlaskit/primitives';
+import { Box, Grid, Stack } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
 import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import invariant from 'tiny-invariant';
@@ -14,62 +14,55 @@ import { type MatrixCoord, type PlacementMap, isMatrixIssueDragData } from './ty
 
 const gridStyles = cssMap({
 	container: {
-		paddingBlock: token('space.200'),
-		paddingInline: token('space.200'),
+		paddingBlock: token('space.300'),
+		paddingInline: token('space.300'),
 		backgroundColor: token('color.background.neutral.subtle'),
-		borderRadius: token('radius.large'),
+		borderRadius: token('radius.xlarge'),
 		boxShadow: token('elevation.shadow.raised'),
+		borderWidth: '1px',
+		borderStyle: 'solid',
+		borderColor: token('color.border'),
 	},
 	grid: {
 		width: '100%',
-	},
-	columnLabel: {
-		padding: token('space.050'),
-		textAlign: 'center',
-	},
-	rowLabel: {
-		writingMode: 'vertical-rl',
-		textAlign: 'center',
-		whiteSpace: 'nowrap',
 	},
 });
 
 const cellStyles = cssMap({
 	cell: {
 		padding: token('space.150'),
-		minHeight: '180px',
-		backgroundColor: token('color.background.neutral'),
+		backgroundColor: token('color.background.accent.gray.subtler.hovered'),
 		borderRadius: token('radius.large'),
 		borderWidth: '2px',
 		borderStyle: 'solid',
-		borderColor: token('color.border'),
+		borderColor: token('color.border.discovery'),
 		transition: 'border-color 150ms ease, background-color 150ms ease',
+		aspectRatio: '1 / 1',
+		display: 'flex',
+		flexDirection: 'column',
 	},
 	active: {
 		borderColor: token('color.border.discovery'),
-		backgroundColor: token('color.background.discovery'),
+		backgroundColor: token('color.background.accent.gray.subtler.pressed'),
 	},
 	cardList: {
 		width: '100%',
+		flexGrow: 1,
 	},
 });
 
 type MatrixGridProps = {
 	gridSize: number;
-	impactScale: string[];
-	effortScale: string[];
 	issues: SwipeIssue[];
 	placements: PlacementMap;
 };
 
 type MatrixCellProps = {
 	coord: MatrixCoord;
-	impactLabel: string;
-	effortLabel: string;
 	children: ReactNode;
 };
 
-function MatrixCell({ coord, impactLabel, effortLabel, children }: MatrixCellProps) {
+function MatrixCell({ coord, children }: MatrixCellProps) {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const [isActive, setIsActive] = useState(false);
 	const { row, col } = coord;
@@ -94,28 +87,20 @@ function MatrixCell({ coord, impactLabel, effortLabel, children }: MatrixCellPro
 
 	return (
 		<Box ref={ref} xcss={cx(cellStyles.cell, isActive && cellStyles.active)}>
-			<Stack space="space.150" alignInline="stretch">
-				<Text size="small" weight="bold">
-					{impactLabel}
-				</Text>
-				<Text size="small" tone="subtle">
-					{effortLabel}
-				</Text>
-				<Stack space="space.150" xcss={cellStyles.cardList}>
-					{children}
-				</Stack>
+			<Stack space="space.150" xcss={cellStyles.cardList}>
+				{children}
 			</Stack>
 		</Box>
 	);
 }
 
 /**
- * MatrixGrid mirrors the pragmatic drag and drop chessboard layout.
- * Each cell is a drop target that captures issue placements.
+ * MatrixGrid is basd off of the chessboard tutorial example for pragmatic drag and drop
+ * Each cell is a drop target that captures issue placements
  */
-export function MatrixGrid({ gridSize, impactScale, effortScale, issues, placements }: MatrixGridProps) {
+export function MatrixGrid({ gridSize, issues, placements }: MatrixGridProps) {
 	const columnTemplate = useMemo(
-		() => `auto repeat(${gridSize}, minmax(220px, 1fr))`,
+		() => `repeat(${gridSize}, minmax(220px, 1fr))`,
 		[gridSize],
 	);
 
@@ -137,57 +122,29 @@ export function MatrixGrid({ gridSize, impactScale, effortScale, issues, placeme
 	}, [issues, placements]);
 
 	return (
-		<Stack space="space.200">
-			<Heading as="h2" size="medium">
-				Impact vs Effort Matrix
-			</Heading>
-			<Box xcss={gridStyles.container}>
-				<Grid gap="space.150" templateColumns={columnTemplate} xcss={gridStyles.grid}>
-					<Box />
-					{impactScale.map((label, index) => (
-						<Box key={`impact-${index}`} xcss={gridStyles.columnLabel}>
-							<Text size="small" weight="bold">
-								{label}
-							</Text>
-						</Box>
-					))}
-					{Array.from({ length: gridSize }).map((_, row) => (
-						<Fragment key={`row-${row}`}>
-							<Box xcss={gridStyles.rowLabel}>
-								<Text weight="bold" tone="subtle">
-									{effortScale[row]}
-								</Text>
-							</Box>
-							{Array.from({ length: gridSize }).map((_, col) => {
+			<Stack space="space.200">
+				<Heading as="h2" size="medium">
+					Impact vs Effort Matrix
+				</Heading>
+				<Box xcss={gridStyles.container}>
+					<Grid gap="space.150" templateColumns={columnTemplate} xcss={gridStyles.grid}>
+						{Array.from({ length: gridSize }).map((_, row) =>
+							Array.from({ length: gridSize }).map((_, col) => {
 								const coord: MatrixCoord = { row, col };
 								const location = { type: 'grid' as const, coord };
 								const key = `${row}-${col}`;
 								const cellIssues = cellIssueMap.get(key) ?? [];
 								return (
-									<MatrixCell
-										key={key}
-										coord={coord}
-										impactLabel={impactScale[col]}
-										effortLabel={effortScale[row]}
-									>
-										{cellIssues.length === 0 && (
-											<Text size="small" tone="subtle">
-												Drop cards here
-											</Text>
-										)}
+									<MatrixCell key={key} coord={coord}>
 										{cellIssues.map((issue) => (
 											<MatrixIssueCard key={issue.id} issue={issue} location={location} />
 										))}
 									</MatrixCell>
 								);
-							})}
-						</Fragment>
-					))}
-				</Grid>
-			</Box>
-			<Text size="small" tone="subtle">
-				Tip: drag cards anywhere on the grid to compare relative impact and effort.
-			</Text>
-		</Stack>
-	);
-}
+							}),
+						)}
+					</Grid>
+				</Box>
+			</Stack>
+		);
+	}

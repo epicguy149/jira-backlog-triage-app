@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import Heading from '@atlaskit/heading';
 import { cssMap, cx } from '@atlaskit/css';
-import { Box, Inline, Stack, Text } from '@atlaskit/primitives';
+import { Box, Stack, Text } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
 import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import invariant from 'tiny-invariant';
@@ -15,16 +14,18 @@ import { type CardLocation, isMatrixIssueDragData } from './types';
 const styles = cssMap({
 	container: {
 		borderWidth: '1px',
-		borderStyle: 'dashed',
-		borderColor: token('color.border.discovery'),
-		borderRadius: token('radius.large'),
-		padding: token('space.200'),
-		backgroundColor: token('color.background.discovery'),
-		transition: 'border-color 150ms ease, background-color 150ms ease',
+		borderStyle: 'solid',
+		borderColor: token('color.border'),
+		borderRadius: token('radius.xlarge'),
+		padding: token('space.300'),
+		backgroundColor: token('color.background.accent.gray.subtler.hovered'),
+		boxShadow: token('elevation.shadow.raised'),
+		transition: 'border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease',
 	},
 	active: {
 		borderColor: token('color.border.focused'),
-		backgroundColor: token('color.background.discovery.hovered'),
+		backgroundColor: token('color.background.accent.gray.subtler.pressed'),
+		boxShadow: token('elevation.shadow.overlay'),
 	},
 	cardList: {
 		rowGap: token('space.200'),
@@ -38,8 +39,8 @@ type MatrixBenchProps = {
 };
 
 /**
- * MatrixBench acts as a staging area for backlog issues.
- * Cards originate here and can be dragged back at any time to reprioritise.
+ * MatrixBench is where cards first appear in matrix mode
+ * Cards originate here and can be dragged back at any time
  */
 export function MatrixBench({ issues }: MatrixBenchProps) {
 	const ref = useRef<HTMLDivElement | null>(null);
@@ -64,27 +65,17 @@ export function MatrixBench({ issues }: MatrixBenchProps) {
 	}, []);
 
 	return (
-		<Stack space="space.200">
-			<Heading as="h2" size="medium">
-				Bench
-			</Heading>
-			<Box ref={ref} xcss={cx(styles.container, isActive && styles.active)}>
-				<Stack space="space.200">
-					<Text size="small" tone="subtle">
-						Drag a card from the bench onto the matrix to start ranking.
+		<Box ref={ref} xcss={cx(styles.container, isActive && styles.active)}>
+			<Stack space="space.200">
+				{issues.length === 0 && (
+					<Text tone="subtle" size="small">
+						No cards awaiting placement.
 					</Text>
-					<Inline alignBlock="start" shouldWrap xcss={styles.cardList} space="space.200">
-						{issues.length === 0 && (
-							<Text tone="subtle" size="small">
-								All prioritised cards have left the bench.
-							</Text>
-						)}
-						{issues.map((issue) => (
-							<MatrixIssueCard key={issue.id} issue={issue} location={benchLocation} />
-						))}
-					</Inline>
-				</Stack>
-			</Box>
-		</Stack>
+				)}
+				{issues.map((issue) => (
+					<MatrixIssueCard key={issue.id} issue={issue} location={benchLocation} />
+				))}
+			</Stack>
+		</Box>
 	);
 }
