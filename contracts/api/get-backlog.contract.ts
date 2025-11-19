@@ -17,10 +17,14 @@ export const SwipeIssueSchema = z.object({
     key: z.string(),
     summary: z.string(),
     status: z.string(),
+    
     priorityName: z.string().nullable(),
     priorityIconUrl: z.string().nullable(),
+    priorityId: z.string().nullable(),
+
     assigneeDisplayName: z.string().nullable(),
     assigneeAvatarUrl: z.string().nullable(),
+
     issueTypeName: z.string().nullable(),
     issueTypeIconUrl: z.string().nullable(),
 
@@ -28,6 +32,12 @@ export const SwipeIssueSchema = z.object({
     description: z.string().nullable(),
     // to filter swiped/unswiped
     swiped: z.boolean().optional().default(false),
+
+    epicKey: z.string().nullable(),
+    epicSummary: z.string().nullable(),
+    epicColor: z.string().nullable(),
+
+    storyPoints: z.number().nullable(),
 })
 
 export type SwipeIssue = z.infer<typeof SwipeIssueSchema>;
