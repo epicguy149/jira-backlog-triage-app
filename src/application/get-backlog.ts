@@ -7,6 +7,7 @@ import {
 import { type JiraBacklogResponse, toSwipeIssue }  from './swipe-transformers';
 import { getSwipedSet } from '../persistence/swipe-storage';
 import { buildJqlQuery } from './jql-builder';
+import { getJiraFields } from './get-jira-fields';
 
 type GetBacklogContext = {
     accountId: string;
@@ -23,6 +24,8 @@ export async function getBacklog(
         throw new Error('no boardId provided');
     }
 
+    const { epicLinkFieldId, storyPointsFieldId } = await getJiraFields();
+
     const swipedSet = await getSwipedSet(boardId, accountId);
 
     const jql = buildJqlQuery({
@@ -37,7 +40,15 @@ export async function getBacklog(
         });
     }
 
-    const fields = 'summary,status,priority,assignee,description,updated,issuetype';
+    let fields = 'summary,status,priority,assignee,description,updated,issuetype,epic';
+
+    if (epicLinkFieldId) {
+        fields += `,${epicLinkFieldId}`;
+    }
+
+    if (storyPointsFieldId) {
+        fields = fields + `,${storyPointsFieldId}`;
+    }
 
     const params = new URLSearchParams({
         startAt: String(startAt),
@@ -74,11 +85,22 @@ export async function getBacklog(
         return SwipeIssuePageSchema.parse(empty);
     }
 
-    const swipeIssues = issues.map((issue) => 
-        toSwipeIssue(issue, {
+    const swipeIssues = issues.map((issue) => {
+        const fields = issue.fields as any;
+
+        const epicKey: string | null = epicLinkFieldId ? (fields[epicLinkFieldId] as string) : null;
+        const epicSummary: string | null = fields.epic?.summary ?? null;
+        const epicColor: string | null = fields.epic?.color?.key ?? null;
+
+        const storyPoints: number | null = storyPointsFieldId ? (fields[storyPointsFieldId] as number): null;
+        return toSwipeIssue(issue, {
             swiped: swipedSet.has(issue.key),
-        }),
-    );
+            epicKey,
+            epicSummary,
+            epicColor,
+            storyPoints,
+        })
+    });
 
     const content: unknown = {
         issues: swipeIssues,
