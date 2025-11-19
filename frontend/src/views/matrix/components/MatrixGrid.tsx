@@ -22,6 +22,8 @@ const gridStyles = cssMap({
 		borderWidth: '1px',
 		borderStyle: 'solid',
 		borderColor: token('color.border'),
+		maxWidth: '1080px',
+		marginInline: 'auto',
 	},
 	grid: {
 		width: '100%',
@@ -33,13 +35,14 @@ const cellStyles = cssMap({
 		padding: token('space.150'),
 		backgroundColor: token('color.background.accent.gray.subtler.hovered'),
 		borderRadius: token('radius.large'),
-		borderWidth: '2px',
-		borderStyle: 'solid',
+		// borderWidth: '2px',
+		// borderStyle: 'solid',
 		borderColor: token('color.border.discovery'),
 		transition: 'border-color 150ms ease, background-color 150ms ease',
 		aspectRatio: '1 / 1',
 		display: 'flex',
 		flexDirection: 'column',
+		overflow: 'hidden',
 	},
 	active: {
 		borderColor: token('color.border.discovery'),
@@ -48,6 +51,8 @@ const cellStyles = cssMap({
 	cardList: {
 		width: '100%',
 		flexGrow: 1,
+		minHeight: 0,
+		overflowY: 'auto', // adds scrolling when you add enough cards to a cell
 	},
 });
 
@@ -87,7 +92,7 @@ function MatrixCell({ coord, children }: MatrixCellProps) {
 
 	return (
 		<Box ref={ref} xcss={cx(cellStyles.cell, isActive && cellStyles.active)}>
-			<Stack space="space.150" xcss={cellStyles.cardList}>
+			<Stack space="space.100" xcss={cellStyles.cardList}>
 				{children}
 			</Stack>
 		</Box>
@@ -100,7 +105,7 @@ function MatrixCell({ coord, children }: MatrixCellProps) {
  */
 export function MatrixGrid({ gridSize, issues, placements }: MatrixGridProps) {
 	const columnTemplate = useMemo(
-		() => `repeat(${gridSize}, minmax(220px, 1fr))`,
+		() => `repeat(${gridSize}, minmax(160px, 1fr))`,
 		[gridSize],
 	);
 
