@@ -17,7 +17,7 @@ import {
   deleteIssue,
   moveIssueToSprint,
   moveIssueToBacklog,
-} from '~backend/application';
+} from '../application';
 
 const resolver = new Resolver();
 
