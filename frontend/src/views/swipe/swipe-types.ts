@@ -11,4 +11,6 @@ export type ActionHistoryItem = {
     timestamp: number;
     type: SwipeActionType;
     sprintName?: string;
+    disabled?: boolean;
+    label?: string;
 }
