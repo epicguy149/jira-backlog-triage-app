@@ -1,0 +1,116 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import Heading from '@atlaskit/heading';
+import Lozenge from '@atlaskit/lozenge';
+import { cssMap, cx } from '@atlaskit/css';
+import { Box, Inline, Stack, Text } from '@atlaskit/primitives';
+import { token } from '@atlaskit/tokens';
+import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import invariant from 'tiny-invariant';
+
+import type { SwipeIssue } from '~contracts/api';
+
+import type { CardLocation } from './types';
+
+const styles = cssMap({
+	card: {
+		paddingBlock: token('space.200'),
+		paddingInline: token('space.200'),
+		backgroundColor: token('color.background.neutral'),
+		borderRadius: token('radius.large'),
+		boxShadow: token('elevation.shadow.raised'),
+		borderWidth: '1px',
+		borderStyle: 'solid',
+		borderColor: token('color.border.accent.blue'),
+		cursor: 'grab',
+		minWidth: '220px',
+		maxWidth: '280px',
+		transition: 'box-shadow 150ms ease, transform 150ms ease',
+		'&:hover': {
+			boxShadow: token('elevation.shadow.overlay'),
+			transform: 'translateY(-2px)',
+		},
+	},
+		dragging: {
+			opacity: 0.55,
+			cursor: 'grabbing',
+			boxShadow: token('elevation.shadow.overlay'),
+		},
+	summary: {
+		wordBreak: 'break-word',
+	},
+});
+
+type MatrixIssueCardProps = {
+	issue: SwipeIssue;
+	location: CardLocation;
+};
+
+function statusAppearance(status: string): React.ComponentProps<typeof Lozenge>['appearance'] {
+	if (status.toLowerCase().includes('done')) {
+		return 'success';
+	}
+
+	if (status.toLowerCase().includes('progress')) {
+		return 'inprogress';
+	}
+
+	return 'default';
+}
+
+/**
+ * MatrixIssueCard renders a draggable tile using Atlassian primitives.
+ * Cards describe the issue and expose their metadata to the drag monitor.
+ */
+export function MatrixIssueCard({ issue, location }: MatrixIssueCardProps) {
+	const ref = useRef<HTMLDivElement | null>(null);
+	const [isDragging, setIsDragging] = useState(false);
+	const gridRow = location.type === 'grid' ? location.coord.row : null;
+	const gridCol = location.type === 'grid' ? location.coord.col : null;
+	const dragLocation = useMemo<CardLocation>(
+		() =>
+			location.type === 'grid'
+				? { type: 'grid', coord: { row: gridRow ?? 0, col: gridCol ?? 0 } }
+				: { type: 'bench' },
+		[location.type, gridRow, gridCol],
+	);
+
+	useEffect(() => {
+		const element = ref.current;
+		invariant(element, 'MatrixIssueCard expects a ref element');
+
+		return draggable({
+			element,
+			getInitialData: () => ({
+				type: 'matrix-issue',
+				issueId: issue.id,
+				from: dragLocation,
+			}),
+			onDragStart: () => setIsDragging(true),
+			onDrop: () => setIsDragging(false),
+		});
+	}, [issue.id, dragLocation]);
+
+	return (
+		<Box ref={ref} xcss={cx(styles.card, isDragging && styles.dragging)}>
+			<Stack space="space.100">
+				<Text size="small" weight="bold" tone="subtle">
+					{issue.key}
+				</Text>
+				<Heading as="h3" size="small" xcss={styles.summary}>
+					{issue.summary}
+				</Heading>
+				<Inline space="space.100" alignBlock="center">
+					<Lozenge appearance={statusAppearance(issue.status)} isBold>
+						{issue.status}
+					</Lozenge>
+					{issue.priorityName && (
+						<Text size="small" tone="subtle">
+							{issue.priorityName}
+						</Text>
+					)}
+				</Inline>
+			</Stack>
+		</Box>
+	);
+}
