@@ -10,6 +10,8 @@ import {
   type MoveIssueToSprintResponse,
   MoveIssueToBacklogRequestSchema,
   type MoveIssueToBacklogResponse,
+  UpdateIssueRequestSchema,
+  type UpdateIssueResponse
 } from '../../contracts/api';
 import { 
   getBacklog,
@@ -17,6 +19,7 @@ import {
   deleteIssue,
   moveIssueToSprint,
   moveIssueToBacklog,
+  updateIssue
 } from '../application';
 
 const resolver = new Resolver();
@@ -63,5 +66,12 @@ resolver.define(
     return moveIssueToBacklog(payload);
   },
 );
+
+resolver.define(
+  'updateIssue',
+  async (req): Promise<UpdateIssueResponse> => {
+    const payload = UpdateIssueRequestSchema.parse(req.payload);
+    return updateIssue(payload);
+});
 
 export const handler = resolver.getDefinitions();
