@@ -6,7 +6,7 @@ import {
     type Dispatch,        
     type SetStateAction 
 } from 'react';
-import type { SwipeIssuePage, SwipeFilterState } from '~contracts/api';
+import type { SwipeIssuePage, SwipeFilterState, SwipeIssue } from '~contracts/api';
 import type { ActionHistoryItem } from '../views/swipe/swipe-types';
 
 // maintain last 20 actions
@@ -77,6 +77,8 @@ interface IAppContext {
 
     jiraBaseUrl: string | null;
     setJiraBaseUrl: (url: string | null) => void;
+
+    updateIssueInPage: (issueKey: string, patch: Partial<SwipeIssue>) => void;
 }
 
 const AppContext = createContext<IAppContext | undefined>(undefined);
@@ -124,6 +126,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         );
     };
 
+    const updateIssueInPage = (issueKey: string, patch: Partial<SwipeIssue>) => {
+        setSwipePage(prev => {
+            if (!prev) {
+                return prev;
+            }
+            const issues = prev.issues.map(issue =>
+                issue.key === issueKey ? { ...issue, ...patch } : issue,
+            );
+
+            return { ...prev, issues };
+        });
+    };
+
     const value = {
         view,
         isSettingsOpen,
@@ -148,6 +163,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         historyActionRequest,
         setHistoryActionRequest,
         disableHistoryItem,
+        updateIssueInPage,
     };
 
     return (
