@@ -76,7 +76,7 @@ export default React.memo(function AppTopNav() {
 			</TopNavMiddle> */}
 
             <TopNavEnd>
-                <TopNavButton iconBefore={AiChatIcon}>Chat with AI</TopNavButton>
+                {/* <TopNavButton iconBefore={AiChatIcon}>Chat with AI</TopNavButton> */}
                 <Help label="Help" />
                 <Settings
                     label="Settings"
