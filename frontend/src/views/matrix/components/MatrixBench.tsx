@@ -38,8 +38,8 @@ type MatrixBenchProps = {
 	issues: SwipeIssue[];
 };
 
-// The bench  is where cards first appear in matrix mode
-// Cards originate here and can be dragged back at any time
+// The bench  is the container where cards first appear in matrix mode
+// can be dragged back at any time
 // MatrixBench renders the staging area drop target for cards that aren't yet on the grid 
 export function MatrixBench({ issues }: MatrixBenchProps) {
 
@@ -50,8 +50,10 @@ export function MatrixBench({ issues }: MatrixBenchProps) {
 	useEffect(() => {
 
 		const element = ref.current;
-		invariant(element, 'MatrixBench expects a ref element');
 
+		invariant(element, 'MatrixBench expecs ref elemet');
+
+		// dragging to and from bench 
 		return dropTargetForElements({
 			element,
 			getData: () => ({ type: 'matrix-bench' }),
@@ -62,7 +64,9 @@ export function MatrixBench({ issues }: MatrixBenchProps) {
 				}
 			},
 			onDragLeave: () => setIsActive(false),
+
 			onDrop: () => setIsActive(false),
+
 		});
 	}, []);
 
@@ -79,6 +83,7 @@ export function MatrixBench({ issues }: MatrixBenchProps) {
 				{issues.map((issue) => (
 					<MatrixIssueCard key={issue.id} issue={issue} location={benchLocation} /> 
 				))}
+
 			</Stack>   
 		</Box>
 	);

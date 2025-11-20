@@ -65,11 +65,11 @@ function statusAppearance(status: string): React.ComponentProps<typeof Lozenge>[
 	return 'default';
 }
 
-	/**
-	 * Renders a draggable tile using atlassian primitives.
-	 * Cards describe the issue and expose their metadata to the drag monitor.
-	 */
+	//
+	// Renders draggable tile using atlaskit drag n drop
+	// 
 export function MatrixIssueCard({ issue, location, score }: MatrixIssueCardProps) {
+
 	const ref = useRef<HTMLDivElement | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const gridRow = location.type === 'grid' ? location.coord.row : null;
@@ -99,6 +99,7 @@ export function MatrixIssueCard({ issue, location, score }: MatrixIssueCardProps
 		});
 	}, [issue.id, dragLocation]);
 
+	// render
 	return (
 		<Box ref={ref} xcss={cx(styles.card, isDragging && styles.dragging)}>
 			<Stack space="space.100">

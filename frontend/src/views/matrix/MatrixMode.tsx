@@ -147,33 +147,39 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 	const issues = swipePage?.issues ?? [];
 
-	// whenever the page of issues changes ensure each issue has a placement entry
+	// whenever the page of issuess changes ensure each issue has a placement entry
 	useEffect(() => {
 
 		if (issues.length === 0) {
 			setPlacements({});
 			setScores({});
 			return;
+
 		}
 
 		setPlacements((prev) => {
-			const next: PlacementMap = {};
-			let changed = false;
-			const issueIds = new Set<string>();
 
-			for (const issue of issues) {
+			const next: PlacementMap = {}; 
+			let changed = false;
+			const issueIds = new Set<string>(); 
+
+			for (const issue of issues) {  
+
 				issueIds.add(issue.id);
 				if (prev[issue.id]) {
 					next[issue.id] = prev[issue.id];
 
+
 				} else {
 					next[issue.id] = { type: 'bench' };
 					changed = true;
+
 				}
 
-			}
+			} 
 
 			for (const issueId of Object.keys(prev)) {
+
 				if (!issueIds.has(issueId)) {
 					changed = true;
 				}
@@ -181,11 +187,13 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 			if (!changed) {
 				return prev;
+
 			}
 
-			return next;
+			return next; 
 		});
 
+		// apply scores at this stage 
 		setScores((prev) => {
 			const issueIds = new Set(issues.map((issue) => issue.id));
 			let changed = false;
@@ -205,11 +213,13 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 	// attach global drop monitoring so cards update placements when moved 
 	useEffect(() => {
+
 		return monitorForElements({ 
 			onDrop({ source, location }) {
 				if (!isMatrixIssueDragData(source.data)) {
 					return;
-				}
+
+				} 
 
 				const destination = location.current.dropTargets[0];
 				if (!destination) {

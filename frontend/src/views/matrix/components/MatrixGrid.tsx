@@ -59,6 +59,7 @@ const gridStyles = cssMap({
 		gridRow: '2 / 3',
 		writingMode: 'vertical-rl',
 	},
+
 	centerCell: {
 		gridColumn: '2 / 3',
 		gridRow: '2 / 3',
@@ -67,6 +68,8 @@ const gridStyles = cssMap({
 });
 
 const cellStyles = cssMap({
+
+	// I LOVE ATLASSIAN DESIGN SYSTEM 
 	cell: {
 		padding: token('space.150'),
 		backgroundColor: token('color.background.neutral'),
@@ -147,7 +150,7 @@ function MatrixCell({ coord, children }: MatrixCellProps) {
 	);
 }
 
- // MatrixGrid is basd off of the chessboard tutorial example for pragmatic drag and drop
+ // MatrixGrid is basd off of le chessboard tutorial example for pragmatic drag and drop
  // Each cell is a drop target that captures issue placements,, issues are grouped by coordinates
 //
 export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridProps) {
@@ -180,10 +183,12 @@ export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridP
 
 	return (
 		//grid render
+		// also includees the lables indicating impact/effort around the grid
 		<Box xcss={gridStyles.layout}>
 			<Box xcss={gridStyles.topLabel}>
 				<Heading size="medium">Most Impact</Heading>
 			</Box>
+
 			<Box xcss={gridStyles.leftLabel}>
 				<Heading size="medium">Most Effort</Heading>
 			</Box>
@@ -205,12 +210,12 @@ export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridP
 											key={issue.id}
 											issue={issue}
 											location={location}
-											score={scores[issue.id]}
+											score={scores[issue.id]} 
 										/>
 
 									))} 
 								</MatrixCell> 
-							);
+							); 
 						})
 					))} 
 				</Grid>
