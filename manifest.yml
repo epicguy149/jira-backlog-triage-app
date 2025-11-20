@@ -51,6 +51,7 @@ permissions:
     - read:issue-details:jira
     - write:sprint:jira-software
     - read:sprint:jira-software
+    - read:epic:jira-software
     
   content:
     scripts:
