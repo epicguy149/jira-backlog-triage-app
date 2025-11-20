@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 import { cssMap, cx } from '@atlaskit/css';
+import Heading from '@atlaskit/heading';
 import { Box, Grid, Stack } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
 import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
@@ -12,6 +13,16 @@ import { MatrixIssueCard } from './MatrixIssueCard';
 import { type MatrixCoord, type PlacementMap, isMatrixIssueDragData } from './types';
 
 const gridStyles = cssMap({
+	layout: {
+		display: 'grid',
+		gridTemplateColumns: 'auto 1fr auto',
+		gridTemplateRows: 'auto 1fr auto',
+		gap: token('space.200'),
+		alignItems: 'center',
+		justifyItems: 'center',
+		maxWidth: '1200px',
+		marginInline: 'auto',
+	},
 	container: {
 		paddingBlock: token('space.300'),
 		paddingInline: token('space.300'),
@@ -22,9 +33,33 @@ const gridStyles = cssMap({
 		borderStyle: 'solid',
 		borderColor: token('color.border'),
 		maxWidth: '1080px',
-		marginInline: 'auto',
+		width: '100%',
 	},
 	grid: {
+		width: '100%',
+	},
+	topLabel: {
+		gridColumn: '2 / 3',
+		gridRow: '1 / 2',
+	},
+	bottomLabel: {
+		gridColumn: '2 / 3',
+		gridRow: '3 / 4',
+	},
+	leftLabel: {
+		gridColumn: '1 / 2',
+		gridRow: '2 / 3',
+		writingMode: 'vertical-rl',
+		transform: 'rotate(180deg)',
+	},
+	rightLabel: {
+		gridColumn: '3 / 4',
+		gridRow: '2 / 3',
+		writingMode: 'vertical-rl',
+	},
+	centerCell: {
+		gridColumn: '2 / 3',
+		gridRow: '2 / 3',
 		width: '100%',
 	},
 });
@@ -140,30 +175,43 @@ export function MatrixGrid({ gridSize, issues, placements }: MatrixGridProps) {
 
 	return (
 		//grid render
-		<Box xcss={gridStyles.container}>
-			<Grid gap="space.150" templateColumns={columnTemplate} xcss={gridStyles.grid}>
-				{Array.from({ length: gridSize }).map((_, row) =>
-				        {/* Le epic render grid from an array */}
+		<Box xcss={gridStyles.layout}>
+			<Box xcss={gridStyles.topLabel}>
+				<Heading size="medium">Most Impact</Heading>
+			</Box>
+			<Box xcss={gridStyles.leftLabel}>
+				<Heading size="medium">Least Effort</Heading>
+			</Box>
+			<Box xcss={cx(gridStyles.container, gridStyles.centerCell)}>
+				<Grid gap="space.150" templateColumns={columnTemplate} xcss={gridStyles.grid}>
+					{Array.from({ length: gridSize }).map((_, row) => (
+					        // Le epic render grid from an array
+						Array.from({ length: gridSize }).map((_, col) => {
 
-					Array.from({ length: gridSize }).map((_, col) => {
+							const coord: MatrixCoord = { row, col };
+							const location = { type: 'grid' as const, coord };
+							const key = `${row}-${col}`; 
+							const cellIssues = cellIssueMap.get(key) ?? [];
 
-						const coord: MatrixCoord = { row, col };
-						const location = { type: 'grid' as const, coord };
-						const key = `${row} - ${col}`; 
-						const cellIssues = cellIssueMap.get(key) ?? [];
+							return ( 
+								<MatrixCell key={key} coord={coord}> 
+									{cellIssues.map((issue) => (
+										<MatrixIssueCard key={issue.id} issue={issue} location={location}  />
 
-						return ( 
-							<MatrixCell key={key} coord={coord}> 
-								{cellIssues.map((issue) => (
-									<MatrixIssueCard key={issue.id} issue={issue} location={location}  />
+									))} 
+								</MatrixCell> 
+							);
+						})
+					))} 
+				</Grid>
 
-								))} 
-							</MatrixCell> 
-						);
-					}),
-				)} 
-			</Grid>
-
+			</Box>
+			<Box xcss={gridStyles.rightLabel}>
+				<Heading size="medium">Most Effort</Heading>
+			</Box>
+			<Box xcss={gridStyles.bottomLabel}>
+				<Heading size="medium">Least Impact</Heading>
+			</Box>
 		</Box>
 	); 
 }
