@@ -23,8 +23,12 @@ export async function updateIssue(req: UpdateIssueRequest): Promise<UpdateIssueR
         fields[storyPointsFieldId] = req.storyPoints;
     }
 
-    if (req.epicKey !== undefined && epicLinkFieldId) {
-        fields[epicLinkFieldId] = req.epicKey ?? null;
+    if (req.epicKey !== undefined) {
+        if (epicLinkFieldId) {
+            fields[epicLinkFieldId] = req.epicKey ?? null;
+        } else {
+            fields.parent = req.epicKey ? { key: req.epicKey } : null;
+        }
     }
 
     if (Object.keys(fields).length === 0) {
