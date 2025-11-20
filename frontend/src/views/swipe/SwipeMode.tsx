@@ -12,7 +12,7 @@ import { SwipeIssueGrid } from '../swipe/components/SwipeIssueGrid';
 import { SwipeToolbar } from '../swipe/components/SwipeToolbar';
 import { cssMap } from '@atlaskit/css';
 import { token } from '@atlaskit/tokens';
-import { useEffect, useCallback, Fragment } from 'react';
+import { useEffect, useCallback, Fragment, useState } from 'react';
 import Lozenge from '@atlaskit/lozenge';
 import Spinner from '@atlaskit/spinner';
 import EmptyState from '@atlaskit/empty-state';
@@ -106,6 +106,8 @@ export default function SwipeMode() {
         isLoading: isContextLoading,
         error: contextError,
     } = useJiraContext();
+
+	const [selectedIssue, setSelectedIssue] = useState<SwipeIssue | null>(null);
 
     // initial loading
     useEffect(() => {
