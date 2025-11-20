@@ -38,6 +38,8 @@ const gridStyles = cssMap({
 	grid: {
 		width: '100%',
 	},
+
+	// these are styles for the lables around teh grid
 	topLabel: {
 		gridColumn: '2 / 3',
 		gridRow: '1 / 2',
@@ -67,7 +69,7 @@ const gridStyles = cssMap({
 const cellStyles = cssMap({
 	cell: {
 		padding: token('space.150'),
-		backgroundColor: token('color.background.accent.gray.subtler.hovered'),
+		backgroundColor: token('color.background.neutral'),
 		borderRadius: token('radius.large'),
 		// borderWidth: '2px',
 		// borderStyle: 'solid',
@@ -80,13 +82,15 @@ const cellStyles = cssMap({
 	},
 	active: {
 		borderColor: token('color.border.discovery'),
-		backgroundColor: token('color.background.accent.gray.subtler.pressed'),
+		backgroundColor: token('color.background.neutral.hovered'),
 	},
 	cardList: {
 		width: '100%',
+		minWidth: 0,
 		flexGrow: 1,
 		minHeight: 0,
 		overflowY: 'auto', // adds scrolling when you add enough cards to a cell
+		overflowX: 'hidden',
 	},
 });
 
@@ -181,7 +185,7 @@ export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridP
 				<Heading size="medium">Most Impact</Heading>
 			</Box>
 			<Box xcss={gridStyles.leftLabel}>
-				<Heading size="medium">Least Effort</Heading>
+				<Heading size="medium">Most Effort</Heading>
 			</Box>
 			<Box xcss={cx(gridStyles.container, gridStyles.centerCell)}>
 				<Grid gap="space.150" templateColumns={columnTemplate} xcss={gridStyles.grid}>
@@ -213,7 +217,7 @@ export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridP
 
 			</Box>
 			<Box xcss={gridStyles.rightLabel}>
-				<Heading size="medium">Most Effort</Heading>
+				<Heading size="medium">Least Effort</Heading>
 			</Box>
 			<Box xcss={gridStyles.bottomLabel}>
 				<Heading size="medium">Least Impact</Heading>

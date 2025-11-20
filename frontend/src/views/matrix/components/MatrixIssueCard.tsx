@@ -25,8 +25,9 @@ const styles = cssMap({
 		borderStyle: 'solid',
 		borderColor: token('color.border.accent.blue'),
 		cursor: 'grab',
-		minWidth: '220px',
-		maxWidth: '280px',
+		width: '100%',
+		minWidth: 0,
+		maxWidth: '100%',
 		transition: 'box-shadow 150ms ease, transform 150ms ease',
 		'&:hover': {
 			boxShadow: token('elevation.shadow.overlay'),

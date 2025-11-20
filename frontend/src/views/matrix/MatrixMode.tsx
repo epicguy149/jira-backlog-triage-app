@@ -356,7 +356,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 					Matrix Mode
 				</Heading>
 				<Text tone="subtle">
-					Drag backlog items onto the grid to assign them an impact vs. effort score.
+					Drag backlog items onto the impact vs effort grid to assign them a priority score.
 				</Text>
 			</Stack>
 

@@ -18,13 +18,13 @@ const styles = cssMap({
 		borderColor: token('color.border'),
 		borderRadius: token('radius.xlarge'),
 		padding: token('space.300'),
-		backgroundColor: token('color.background.accent.gray.subtler.hovered'),
+		backgroundColor: token('color.background.neutral.subtle'),
 		boxShadow: token('elevation.shadow.raised'),
 		transition: 'border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease',
 	},
 	active: {
 		borderColor: token('color.border.focused'),
-		backgroundColor: token('color.background.accent.gray.subtler.pressed'),
+		backgroundColor: token('color.background.neutral.pressed'),
 		boxShadow: token('elevation.shadow.overlay'),
 	},
 	cardList: {
