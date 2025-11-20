@@ -1,6 +1,6 @@
 import type { SwipeIssue } from "../../contracts/api";
 
-type JiraIssue = {
+export type JiraIssue = {
     id: string;
     key: string;
     fields: {
@@ -26,9 +26,20 @@ type JiraIssue = {
             iconUrl: string;
         },
         epic?: {
+            name: string;
             summary: string;
             color?: {
                 key?: string;
+            };
+        };
+        parent?: {
+            id: string;
+            key: string;
+            fields?: {
+                summary?: string;
+                issuetype?: {
+                name: string;
+                };
             };
         };
     };
