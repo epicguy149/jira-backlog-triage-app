@@ -14,6 +14,8 @@ import { useJiraContext } from '../../hooks/useJiraContext';
 import { MatrixBench } from './components/MatrixBench';
 import { MatrixGrid } from './components/MatrixGrid';
 import {
+	calculateMatrixScore,
+	type MatrixScore,
 	type PlacementMap,
 	isMatrixBenchDropData,
 	isMatrixCellDropData,
@@ -77,9 +79,10 @@ export default function MatrixMode() {
 		searchQuery,
 		swipeFilters,
 	} = useAppContext();
-	const { boardId, isLoading: isContextLoading, error: contextError } = useJiraContext();
+const { boardId, isLoading: isContextLoading, error: contextError } = useJiraContext();
 
 	const [placements, setPlacements] = useState<PlacementMap>({});
+	const [scores, setScores] = useState<Record<string, MatrixScore>>({});
 
 	// initial load I stole from Swipe mode,  fetches the first page of backlog issues
 	useEffect(() => {
@@ -149,6 +152,7 @@ export default function MatrixMode() {
 
 		if (issues.length === 0) {
 			setPlacements({});
+			setScores({});
 			return;
 		}
 
@@ -180,6 +184,22 @@ export default function MatrixMode() {
 			}
 
 			return next;
+		});
+
+		setScores((prev) => {
+			const issueIds = new Set(issues.map((issue) => issue.id));
+			let changed = false;
+			const next: Record<string, MatrixScore> = {};
+
+			for (const [issueId, value] of Object.entries(prev)) {
+				if (issueIds.has(issueId)) {
+					next[issueId] = value;
+				} else {
+					changed = true;
+				}
+			}
+
+			return changed ? next : prev;
 		});
 	}, [issues]);
 
@@ -224,6 +244,25 @@ export default function MatrixMode() {
 						};
 					});
 
+					setScores((prev) => {
+						const nextScore = calculateMatrixScore(dropData.coord, GRID_SIZE);
+						const current = prev[source.data.issueId];
+
+						if (
+							current &&
+							current.impact === nextScore.impact &&
+							current.effort === nextScore.effort &&
+							current.score === nextScore.score
+						) {
+							return prev;
+						}
+
+						return {
+							...prev,
+							[source.data.issueId]: nextScore,
+						};
+					});
+
 					return;
 				}
 
@@ -239,6 +278,15 @@ export default function MatrixMode() {
 							[source.data.issueId]: { type: 'bench' },
 
 						};
+					});
+
+					setScores((prev) => {
+						if (!(source.data.issueId in prev)) {
+							return prev;
+						}
+
+						const { [source.data.issueId]: _removed, ...rest } = prev;
+						return rest;
 					});
 				}
 			},
@@ -287,7 +335,12 @@ export default function MatrixMode() {
 					<MatrixBench issues={benchIssues} />
 				</Box>
 				<Box xcss={styles.gridColumn}>
-					<MatrixGrid gridSize={GRID_SIZE} issues={issues} placements={placements} />
+					<MatrixGrid
+						gridSize={GRID_SIZE}
+						issues={issues}
+						placements={placements}
+						scores={scores}
+					/>
 				</Box>
 			</Box>
 		);

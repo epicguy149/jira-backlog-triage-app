@@ -10,7 +10,7 @@ import invariant from 'tiny-invariant';
 import type { SwipeIssue } from '~contracts/api';
 
 import { MatrixIssueCard } from './MatrixIssueCard';
-import { type MatrixCoord, type PlacementMap, isMatrixIssueDragData } from './types';
+import { type MatrixCoord, type MatrixScore, type PlacementMap, isMatrixIssueDragData } from './types';
 
 const gridStyles = cssMap({
 	layout: {
@@ -93,7 +93,8 @@ const cellStyles = cssMap({
 type MatrixGridProps = {
 	gridSize: number; 
 	issues: SwipeIssue[];
-	placements: PlacementMap;  
+	placements: PlacementMap; 
+	scores: Record<string, MatrixScore>;
 }; 
 
 type MatrixCellProps = {
@@ -145,7 +146,7 @@ function MatrixCell({ coord, children }: MatrixCellProps) {
  // MatrixGrid is basd off of the chessboard tutorial example for pragmatic drag and drop
  // Each cell is a drop target that captures issue placements,, issues are grouped by coordinates
 //
-export function MatrixGrid({ gridSize, issues, placements }: MatrixGridProps) {
+export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridProps) {
 
 	const columnTemplate = useMemo(
 		() => `repeat(${gridSize}, minmax(160px, 1fr))`,
@@ -196,7 +197,12 @@ export function MatrixGrid({ gridSize, issues, placements }: MatrixGridProps) {
 							return ( 
 								<MatrixCell key={key} coord={coord}> 
 									{cellIssues.map((issue) => (
-										<MatrixIssueCard key={issue.id} issue={issue} location={location}  />
+										<MatrixIssueCard
+											key={issue.id}
+											issue={issue}
+											location={location}
+											score={scores[issue.id]}
+										/>
 
 									))} 
 								</MatrixCell> 

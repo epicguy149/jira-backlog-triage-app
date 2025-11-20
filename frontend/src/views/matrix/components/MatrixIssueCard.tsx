@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import Badge from '@atlaskit/badge';
 import Heading from '@atlaskit/heading';
 import Lozenge from '@atlaskit/lozenge';
 import { cssMap, cx } from '@atlaskit/css';
@@ -7,10 +8,11 @@ import { Box, Inline, Stack, Text } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
 import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import invariant from 'tiny-invariant';
+import Tooltip from '@atlaskit/tooltip';
 
 import type { SwipeIssue } from '~contracts/api';
 
-import type { CardLocation } from './types';
+import type { CardLocation, MatrixScore } from './types';
 
 const styles = cssMap({
 	card: {
@@ -31,19 +33,23 @@ const styles = cssMap({
 			transform: 'translateY(-2px)',
 		},
 	},
-		dragging: {
-			opacity: 0.55,
-			cursor: 'grabbing',
-			boxShadow: token('elevation.shadow.overlay'),
+	dragging: {
+		opacity: 0.55,
+		cursor: 'grabbing',
+		boxShadow: token('elevation.shadow.overlay'),
 		},
 	summary: {
 		wordBreak: 'break-word',
+	},
+	scoreRow: {
+		marginTop: token('space.050'),
 	},
 });
 
 type MatrixIssueCardProps = {
 	issue: SwipeIssue;
 	location: CardLocation;
+	score?: MatrixScore;
 };
 
 function statusAppearance(status: string): React.ComponentProps<typeof Lozenge>['appearance'] {
@@ -62,7 +68,7 @@ function statusAppearance(status: string): React.ComponentProps<typeof Lozenge>[
 	 * Renders a draggable tile using atlassian primitives.
 	 * Cards describe the issue and expose their metadata to the drag monitor.
 	 */
-export function MatrixIssueCard({ issue, location }: MatrixIssueCardProps) {
+export function MatrixIssueCard({ issue, location, score }: MatrixIssueCardProps) {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const gridRow = location.type === 'grid' ? location.coord.row : null;
@@ -111,6 +117,13 @@ export function MatrixIssueCard({ issue, location }: MatrixIssueCardProps) {
 						</Text>
 					)}
 				</Inline>
+				{score && (
+					<Inline space="space.100" alignBlock="center" xcss={styles.scoreRow}>
+						<Tooltip content="Score = (Impact × 1.5) – (Effort × 0.7)">
+							<Badge appearance="primary">Score {score.score.toFixed(1)}</Badge>
+						</Tooltip>
+					</Inline>
+				)}
 			</Stack>
 		</Box>
 	);

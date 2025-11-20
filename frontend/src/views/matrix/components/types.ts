@@ -15,6 +15,12 @@ export type CardLocation =
 // lookup map for placements by issue id
 export type PlacementMap = Record<string, CardLocation>;
 
+export type MatrixScore = {
+	impact: number;
+	effort: number;
+	score: number;
+};
+
 
 // tagged on draggable cards
 export type MatrixIssueDragData = {
@@ -89,3 +95,11 @@ export type CellIssue = {
 	issue: SwipeIssue;
 	location: CardLocation;
 };
+
+export function calculateMatrixScore(coord: MatrixCoord, gridSize: number): MatrixScore {
+	const impact = Math.round(((coord.col + 1) / gridSize) * 10);
+	const effort = Math.round(((coord.row + 1) / gridSize) * 10);
+	const score = impact * 1.5 - effort * 0.7;
+
+	return { impact, effort, score };
+}
