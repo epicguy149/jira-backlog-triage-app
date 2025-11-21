@@ -36,7 +36,7 @@ const styles = cssMap({
     card: {
         display: 'flex',
         flexDirection: 'column',
-        paddingBlockStart: token('space.150'),
+        // paddingBlockStart: token('space.150'),
 		paddingBlockEnd: token('space.150'),
 		paddingInline: token('space.150'),
         color: token('color.text'),
@@ -83,7 +83,8 @@ const styles = cssMap({
 const containerStyles = cssMap({
 	root: {
 		// eslint-disable-next-line @atlaskit/ui-styling-standard/no-unsafe-values
-		width: '70%' as any,
+		// width: '70%' as any,
+        paddingBlockEnd: token('space.150'),
 	},
 });
 
@@ -91,8 +92,8 @@ const readViewContainerStyles = cssMap({
 	root: {
 		font: token('font.body'),
 		// eslint-disable-next-line @atlaskit/ui-styling-standard/no-unsafe-values
-		minHeight: '4em' as any,
-		paddingTop: token('space.075'),
+		minHeight: '3em' as any,
+		// paddingTop: token('space.075'),
 		paddingRight: token('space.075'),
 		paddingBottom: token('space.075'),
 		paddingLeft: token('space.075'),
@@ -385,8 +386,8 @@ export function SwipeIssueCard({
             {/* indicators under card */}
             {showIndicators && (
                 <Box xcss={styles.indicatorContainer} paddingBlockEnd='space.300'>
-                    <Stack alignBlock="center" grow="fill" xcss={{height:'100%'}}>
-                        <Inline space="space.200" spread="space-between" alignBlock='center' grow='fill'>
+                    <Stack alignBlock={activeDirection === 'up' ? 'end' : 'center'} grow="fill" xcss={{height:'100%'}}>
+                        <Inline space="space.200" spread="space-between" alignBlock={activeDirection === 'up' ? 'end' : 'center'} grow='fill'>
                             {/* swipe left */}
                             <Stack alignInline="center" space="space.050" alignBlock='center'>
                                 {activeDirection === 'right' && (
@@ -434,7 +435,7 @@ export function SwipeIssueCard({
                 whileTap={{ scale: 1.02 }}
                 style={{
                     touchAction: 'none',
-                    zIndex: 1,
+                    zIndex: isEditing ? 800 : 1,
                 }}
             > 
                 <Stack space="space.025" spread="space-between" grow="fill">
@@ -445,6 +446,7 @@ export function SwipeIssueCard({
                             onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
                         >
                             <InlineEdit
+                                isRequired
                                 defaultValue={summary}
                                 editButtonLabel={summary || 'Add summary'}
                                 onEdit={() => setIsSummaryEditing(true)}
@@ -522,10 +524,9 @@ export function SwipeIssueCard({
                             </Lozenge> */}
 
                             {/* for story point */}
-                            <Box 
-                                xcss={overlayStyles.storyPointsOverlay} 
-                                onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-                                onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+                            <Inline 
+                                xcss={overlayStyles.storyPointsOverlay}
+                                alignBlock='center'
                             >
                                 {storyPoints && (
                                     <InlineEdit 
@@ -533,12 +534,14 @@ export function SwipeIssueCard({
                                         onEdit={() => setIsStoryPointsEditing(true)}
                                         onCancel={() => setIsStoryPointsEditing(false)}
                                         readView={() => (
-                                            <Badge>
-                                                {storyPoints}
-                                            </Badge>
+                                            <Box paddingBlockEnd='space.050'>
+                                                <Badge>
+                                                    {storyPoints}
+                                                </Badge>
+                                            </Box>
                                         )}
                                         editView={({ errorMessage, ...fieldProps }) => (
-                                            <div style={{ width: '60px' }}>
+                                            <div style={{ width: '60px', alignItems: 'center', zIndex: 800, justifyContent: 'center' }}>
                                                 <Textfield 
                                                     {...fieldProps}
                                                     autoFocus
@@ -586,7 +589,7 @@ export function SwipeIssueCard({
                                         }}
                                     />
                                 )}
-                            </Box>
+                            </Inline>
 
                             {issue.issueTypeName != 'Task' && (<DropdownMenu 
                                 zIndex={999}
@@ -610,6 +613,7 @@ export function SwipeIssueCard({
                                             e.stopPropagation();
                                             triggerProps.onClick?.(e);
                                         }}
+                                        spacing="compact"
                                     />
                                 )}
                             >
