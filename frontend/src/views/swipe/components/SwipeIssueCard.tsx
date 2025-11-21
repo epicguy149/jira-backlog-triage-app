@@ -101,14 +101,14 @@ const readViewContainerStyles = cssMap({
 });
 
 const overlayStyles = cssMap({
-  summaryOverlay: {
-    position: 'relative',
-    zIndex: 800,
-  },
-  storyPointsOverlay: {
-    position: 'relative',
-    zIndex: 800,
-  },
+    summaryOverlay: {
+        position: 'relative',
+        zIndex: 800,
+    },
+    storyPointsOverlay: {
+        position: 'relative',
+        zIndex: 800,
+    },
 });
 
 type Props = {
@@ -209,9 +209,13 @@ export function SwipeIssueCard({
     );
     const [priorityOptions, setPriorityOptions] = useState<PriorityOption[]>([]);
     const { jiraBaseUrl, updateIssueInPage, setBanner } = useAppContext();
+    const [isSummaryEditing, setIsSummaryEditing] = useState(false);
+    const [isStoryPointsEditing, setIsStoryPointsEditing] = useState(false);
 
     const controls = useAnimation();
     const showIndicators = activeDirection !== null && !isSwiping;
+
+    const isEditing = isSummaryEditing || isStoryPointsEditing;
 
     useEffect(() => {
         setSummary(issue.summary);
@@ -421,7 +425,7 @@ export function SwipeIssueCard({
             <MotionPressable
                 onClick={handleClick}
                 xcss={cx(styles.card, isSelected && styles.selected)}
-                drag
+                drag={!isEditing}
                 dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
                 dragElastic={0.3}
                 onDrag={handleDrag}
@@ -430,15 +434,21 @@ export function SwipeIssueCard({
                 whileTap={{ scale: 1.02 }}
                 style={{
                     touchAction: 'none',
-                    zIndex: 1
+                    zIndex: 1,
                 }}
             > 
                 <Stack space="space.025" spread="space-between" grow="fill">
                     <Stack space="space.025">
-                        <Box xcss={cx(containerStyles.root, overlayStyles.summaryOverlay)}>
+                        <Box 
+                            xcss={cx(containerStyles.root, overlayStyles.summaryOverlay)} 
+                            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+                            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+                        >
                             <InlineEdit
                                 defaultValue={summary}
                                 editButtonLabel={summary || 'Add summary'}
+                                onEdit={() => setIsSummaryEditing(true)}
+                                onCancel={() => setIsSummaryEditing(false)}
                                 editView={({ errorMessage, ...fieldProps }, ref) => (
                                     // @ts-ignore - textarea does not pass through ref as a prop
                                     <TextArea {...fieldProps} ref={ref} appearance="standard" resize="none"/>
@@ -450,7 +460,10 @@ export function SwipeIssueCard({
                                 )}
                                 onConfirm={async (value: string) => {
                                     const trimmed = value.trim();
-                                    if (!trimmed || trimmed === summary) return;
+                                    if (!trimmed || trimmed === summary) {
+                                        setIsSummaryEditing(false);
+                                        return;
+                                    }
 
                                     const res = await updateIssue({
                                         issueIdOrKey: issue.key,
@@ -459,6 +472,7 @@ export function SwipeIssueCard({
 
                                     if (res.error) {
                                         setBanner({ message: res.error, type: 'error' });
+                                        setIsSummaryEditing(false);
                                         return;
                                     }
 
@@ -469,6 +483,8 @@ export function SwipeIssueCard({
                                         message: `${issue.key} summary updated`,
                                         type: 'announcement',
                                     });
+
+                                    setIsSummaryEditing(false);
                                 }}
                                 keepEditViewOpenOnBlur
 				                readViewFitContainerWidth
@@ -495,7 +511,7 @@ export function SwipeIssueCard({
                                 />
                             )}
 
-                            <Link href={issueHref} appearance="subtle">
+                            <Link href={issueHref} appearance="subtle" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation()}>
                                 {issue.key}
                             </Link>                            
                         </Inline>
@@ -506,12 +522,16 @@ export function SwipeIssueCard({
                             </Lozenge> */}
 
                             {/* for story point */}
-                            <Box xcss={overlayStyles.storyPointsOverlay}>
+                            <Box 
+                                xcss={overlayStyles.storyPointsOverlay} 
+                                onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+                                onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+                            >
                                 {storyPoints && (
                                     <InlineEdit 
-                                        defaultValue={
-                                            String(storyPoints)
-                                        }
+                                        defaultValue={String(storyPoints)}
+                                        onEdit={() => setIsStoryPointsEditing(true)}
+                                        onCancel={() => setIsStoryPointsEditing(false)}
                                         readView={() => (
                                             <Badge>
                                                 {storyPoints}
@@ -537,6 +557,7 @@ export function SwipeIssueCard({
                                             } else {
                                                 const n = Number(trimmed);
                                                 if (Number.isNaN(n)) {
+                                                    setIsStoryPointsEditing(false);
                                                     return;
                                                 }
                                                 parsed = n;
@@ -549,6 +570,7 @@ export function SwipeIssueCard({
 
                                             if (res.error) {
                                                 setBanner({ message: res.error, type: 'error' });
+                                                setIsStoryPointsEditing(false);
                                                 return;
                                             }
 
@@ -559,12 +581,15 @@ export function SwipeIssueCard({
                                                 message: `Updated ${issue.key} story points`,
                                                 type: 'announcement',
                                             });
+
+                                            setIsStoryPointsEditing(false);
                                         }}
                                     />
                                 )}
                             </Box>
 
-                            <DropdownMenu zIndex={999}
+                            {issue.issueTypeName != 'Task' && (<DropdownMenu 
+                                zIndex={999}
                                 trigger={({ triggerRef, ...triggerProps }) => (
                                     <IconButton
                                         {...triggerProps}
@@ -581,6 +606,10 @@ export function SwipeIssueCard({
                                             />
                                             ) : null
                                         }
+                                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                            e.stopPropagation();
+                                            triggerProps.onClick?.(e);
+                                        }}
                                     />
                                 )}
                             >
@@ -604,7 +633,7 @@ export function SwipeIssueCard({
                                     </DropdownItem>
                                     ))}
                                 </DropdownItemGroup>
-                            </DropdownMenu>
+                            </DropdownMenu>)}
                             <Tooltip content={issue.assigneeDisplayName}>
                                 <Avatar
                                     size="small"
