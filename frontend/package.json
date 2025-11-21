@@ -5,6 +5,7 @@
   "dependencies": {
     "@atlaskit/adf-schema": "^51.4.0",
     "@atlaskit/app-provider": "^3.2.5",
+    "@atlaskit/avatar": "^25.5.4",
     "@atlaskit/badge": "^18.2.4",
     "@atlaskit/banner": "^14.0.17",
     "@atlaskit/css": "^0.15.2",
