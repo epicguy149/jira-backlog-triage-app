@@ -18,6 +18,8 @@ import Spinner from '@atlaskit/spinner';
 import EmptyState from '@atlaskit/empty-state';
 import type { SwipeIssue } from '~contracts/api';
 import type { SwipeDirection } from '../swipe/swipe-types';
+import { SwipeIssueModal } from './components/SwipeIssueModal';
+import { ModalTransition } from '@atlaskit/modal-dialog';
 
 const noResultsImg = new URL('./images/no-results.png', import.meta.url).href;
 const emptyBacklogImg = new URL('./images/empty-backlog.png', import.meta.url).href;
@@ -108,6 +110,10 @@ export default function SwipeMode() {
     } = useJiraContext();
 
 	const [selectedIssue, setSelectedIssue] = useState<SwipeIssue | null>(null);
+
+	const handleIssueClick = useCallback((issue: SwipeIssue) => {
+		setSelectedIssue(issue);
+	}, []);
 
     // initial loading
     useEffect(() => {
@@ -527,10 +533,27 @@ export default function SwipeMode() {
             return <EmptyBacklogState />;
         }
 
-        return <SwipeIssueGrid 
-            issues={issuesToShow} 
-            onIssueSwipe={handleIssueSwipe}
-        />;
+        return (
+			<>
+				<SwipeIssueGrid
+					issues={issuesToShow}
+					selectedIssueId={selectedIssue?.id ?? null}
+					onIssueClick={handleIssueClick}
+					onIssueSwipe={handleIssueSwipe}
+				/>
+				{/* for card focus modal, atlaskit modal has bug or i just cant find way to make modal a window, always renders in fullscreen */}
+				{/* TODO: find way to make modal open in window */}
+{/* 
+				<ModalTransition>
+					{selectedIssue && (
+						<SwipeIssueModal
+						issue={selectedIssue}
+						onClose={() => setSelectedIssue(null)}
+						/>
+					)}
+				</ModalTransition> */}
+			</>
+		)
     };
 
     return (
