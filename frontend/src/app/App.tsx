@@ -119,7 +119,8 @@ function App() {
       >
         <AppTopNav />
       </TopNav>
-
+      
+      {/* defaultCollapsed is officially stated to be deprecated, but sidenav is not collapsed on launch without it */}
       {view === 'swipe' && (
         <SideNav defaultCollapsed>
           <SwipeSideNav />
