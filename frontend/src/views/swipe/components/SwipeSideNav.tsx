@@ -16,7 +16,7 @@ import DeleteIcon from '@atlaskit/icon/core/delete';
 import { LinkButton } from '@atlaskit/button/new';
 import LinkExternalIcon from '@atlaskit/icon/core/link-external';
 import ToolTip from '@atlaskit/tooltip';
-import type { ActionHistoryItem, SwipeActionType } from '../swipe-types';
+import type { ActionHistoryItem } from '../swipe-types';
 import { useAppContext } from 'frontend/src/app/AppContext';
 import { Box, Text } from '@atlaskit/primitives';
 

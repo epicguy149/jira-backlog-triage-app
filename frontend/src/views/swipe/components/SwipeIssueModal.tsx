@@ -1,10 +1,9 @@
-import Modal, { ModalBody, ModalFooter, ModalHeader, ModalTitle, useModal } from '@atlaskit/modal-dialog';
+import Modal, { ModalBody, ModalHeader, ModalTitle, useModal } from '@atlaskit/modal-dialog';
 import Button from '@atlaskit/button/new';
-import { Box, Flex, Stack, Text } from '@atlaskit/primitives';
+import { Box, Flex, Text } from '@atlaskit/primitives';
 
 import type { SwipeIssue } from '~contracts/api';
 import { cssMap } from '@atlaskit/css';
-import Avatar from '@atlaskit/avatar';
 
 type Props = {
   issue: SwipeIssue | null;

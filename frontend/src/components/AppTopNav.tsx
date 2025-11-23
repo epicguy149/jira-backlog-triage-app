@@ -11,7 +11,6 @@ import { TopNavButton } from '@atlaskit/navigation-system/experimental/top-nav-b
 import { Settings } from '@atlaskit/navigation-system/top-nav-items';
 import GridIcon from '@atlaskit/icon/core/grid';
 import ChangesIcon from '@atlaskit/icon/core/changes';
-import AiChatIcon from '@atlaskit/icon/core/ai-chat';
 import { JiraIcon } from '@atlaskit/logo';
 
 export default React.memo(function AppTopNav() {

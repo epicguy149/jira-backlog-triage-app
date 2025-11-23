@@ -18,8 +18,6 @@ import Spinner from '@atlaskit/spinner';
 import EmptyState from '@atlaskit/empty-state';
 import type { SwipeIssue } from '~contracts/api';
 import type { SwipeDirection } from '../swipe/swipe-types';
-import { SwipeIssueModal } from './components/SwipeIssueModal';
-import { ModalTransition } from '@atlaskit/modal-dialog';
 
 const noResultsImg = new URL('./images/no-results.png', import.meta.url).href;
 const emptyBacklogImg = new URL('./images/empty-backlog.png', import.meta.url).href;

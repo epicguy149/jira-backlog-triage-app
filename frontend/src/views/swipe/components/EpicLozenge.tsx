@@ -1,4 +1,3 @@
-import { token } from '@atlaskit/tokens';
 import { Box, Text } from '@atlaskit/primitives';
 
 type ColorPair = {
