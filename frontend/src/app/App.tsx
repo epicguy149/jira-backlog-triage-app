@@ -30,6 +30,7 @@ function AppRouter() {
     case 'matrix': 
       return <MatrixMode />;
     case 'loading':
+      break;
       
     default:       
       return <SwipeMode />;
