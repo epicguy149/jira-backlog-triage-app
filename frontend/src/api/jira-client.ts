@@ -1,12 +1,9 @@
-// file for Jira api calls
-
 import { invoke, requestJira } from '@forge/bridge';
 import type { 
     GetBacklogRequest, 
     GetBacklogResponse,
     SetIssueSwipedRequest,
     SetIssueSwipedResponse,
-    SwipeFilterState,
     DeleteIssueRequest,
     DeleteIssueResponse,
     MoveIssueToSprintRequest,
@@ -16,12 +13,6 @@ import type {
     UpdateIssueRequest,
     UpdateIssueResponse,
 } from '~contracts/api';
-import { useJiraContext } from '../hooks/useJiraContext';
-
-type FetchBacklogParams = Omit<GetBacklogRequest, 'boardId'> & {
-  boardId: string | number;
-  filters?: SwipeFilterState;
-};
 
 export type JiraPriority = {
   id: string;
