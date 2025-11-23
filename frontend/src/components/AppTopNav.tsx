@@ -8,7 +8,7 @@ import {
   AppLogo,
 } from '@atlaskit/navigation-system';
 import { TopNavButton } from '@atlaskit/navigation-system/experimental/top-nav-button';
-import { CustomTitle, Settings} from '@atlaskit/navigation-system/top-nav-items';
+import { Settings } from '@atlaskit/navigation-system/top-nav-items';
 import GridIcon from '@atlaskit/icon/core/grid';
 import ChangesIcon from '@atlaskit/icon/core/changes';
 import AiChatIcon from '@atlaskit/icon/core/ai-chat';
@@ -61,9 +61,6 @@ export default React.memo(function AppTopNav() {
 					label="App name"
 				/>
                 
-                {/* ADS beta feature - doesn't work*/}
-                {/* <CustomTitle>Log Juggler</CustomTitle> */}
-                
                 <TopNavButton iconBefore={ChangesIcon} onClick={() => changeView('swipe')}>Swipe</TopNavButton>
 
                 <TopNavButton iconBefore={GridIcon} onClick={() => changeView('matrix')}>Matrix</TopNavButton>
@@ -76,6 +73,7 @@ export default React.memo(function AppTopNav() {
 			</TopNavMiddle> */}
 
             <TopNavEnd>
+                {/* Was to be implemented: chat with AI that already has context of entire project */}
                 {/* <TopNavButton iconBefore={AiChatIcon}>Chat with AI</TopNavButton> */}
                 <Help label="Help" />
                 <Settings
