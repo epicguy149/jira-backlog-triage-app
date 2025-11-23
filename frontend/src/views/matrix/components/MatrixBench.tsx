@@ -13,7 +13,7 @@ import { type CardLocation, isMatrixIssueDragData } from './types';
 
 const styles = cssMap({
 	container: {
-		borderWidth: '1px',
+		// borderWidth: '1px',
 		borderStyle: 'solid',
 		borderColor: token('color.border'),
 		borderRadius: token('radius.xlarge'),
@@ -76,7 +76,8 @@ export function MatrixBench({ issues }: MatrixBenchProps) {
 			<Stack space="space.200">
 				{/*small helper msg when there arent any cards on the bench*/}
 				{issues.length === 0 && ( 
-					<Text tone="subtle" size="small">
+					// <Text tone="subtle" size="small">
+					<Text size="small">
 						No cards awaiting placement.
 					</Text> 
 				)}

@@ -29,7 +29,7 @@ const gridStyles = cssMap({
 		backgroundColor: token('color.background.neutral.subtle'),
 		borderRadius: token('radius.xlarge'),
 		boxShadow: token('elevation.shadow.raised'),
-		borderWidth: '1px',
+		// borderWidth: '1px',
 		borderStyle: 'solid',
 		borderColor: token('color.border'),
 		maxWidth: '1080px',
@@ -89,9 +89,9 @@ const cellStyles = cssMap({
 	},
 	cardList: {
 		width: '100%',
-		minWidth: 0,
+		// minWidth: 0,
 		flexGrow: 1,
-		minHeight: 0,
+		// minHeight: 0,
 		overflowY: 'auto', // adds scrolling when you add enough cards to a cell
 		overflowX: 'hidden',
 	},

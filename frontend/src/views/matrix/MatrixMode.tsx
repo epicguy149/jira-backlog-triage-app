@@ -102,6 +102,9 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 		async function loadMatrixData() {
 
 			try {
+                if (!boardId) {
+                    return;
+                }
 				setSwipeError(null);
 				setIsSwipeLoading(true);
 				const page = await fetchBacklog({
@@ -216,9 +219,11 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 		return monitorForElements({ 
 			onDrop({ source, location }) {
-				if (!isMatrixIssueDragData(source.data)) {
-					return;
+				const dragData = source.data; // 1. Capture data in a variable
 
+				// 2. Check the variable (narrowing its type for the rest of the function)
+				if (!isMatrixIssueDragData(dragData)) {
+					return;
 				} 
 
 				const destination = location.current.dropTargets[0];
@@ -231,7 +236,8 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 				if (isMatrixCellDropData(dropData)) {
 
 					setPlacements((prev) => { 
-						const prevPlacement = prev[source.data.issueId];
+						// 3. Use dragData instead of source.data
+						const prevPlacement = prev[dragData.issueId];
 						if (
 							prevPlacement &&
 							prevPlacement.type === 'grid' &&
@@ -247,7 +253,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 						return {
 							...prev,
-							[source.data.issueId]: {
+							[dragData.issueId]: {
 								type: 'grid',
 								coord: { row: dropData.coord.row, col: dropData.coord.col }, 
 							},
@@ -256,7 +262,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 					setScores((prev) => {
 						const nextScore = calculateMatrixScore(dropData.coord, GRID_SIZE);
-						const current = prev[source.data.issueId];
+						const current = prev[dragData.issueId];
 
 						if (
 							current &&
@@ -269,7 +275,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 						return {
 							...prev,
-							[source.data.issueId]: nextScore,
+							[dragData.issueId]: nextScore,
 						};
 					});
 
@@ -278,24 +284,24 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 				if (isMatrixBenchDropData(dropData)) {
 					setPlacements((prev) => {
-						const prevPlacement = prev[source.data.issueId];
+						const prevPlacement = prev[dragData.issueId];
 						if (!prevPlacement || prevPlacement.type === 'bench') {
 							return prev;
 						}
 
 						return {
 							...prev,
-							[source.data.issueId]: { type: 'bench' },
+							[dragData.issueId]: { type: 'bench' },
 
 						};
 					});
 
 					setScores((prev) => {
-						if (!(source.data.issueId in prev)) {
+						if (!(dragData.issueId in prev)) {
 							return prev;
 						}
 
-						const { [source.data.issueId]: _removed, ...rest } = prev;
+						const { [dragData.issueId]: _removed, ...rest } = prev;
 						return rest;
 					});
 				}
@@ -365,7 +371,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 				<Heading as="h1" size="large">
 					Matrix Mode
 				</Heading>
-				<Text tone="subtle">
+				<Text>
 					Drag backlog items onto the impact vs effort grid to assign them a priority score.
 				</Text>
 			</Stack>

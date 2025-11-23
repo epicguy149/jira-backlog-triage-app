@@ -21,12 +21,12 @@ const styles = cssMap({
 		backgroundColor: token('color.background.neutral'),
 		borderRadius: token('radius.large'),
 		boxShadow: token('elevation.shadow.raised'),
-		borderWidth: '1px',
+		// borderWidth: '1px',
 		borderStyle: 'solid',
 		borderColor: token('color.border.accent.blue'),
 		cursor: 'grab',
 		width: '100%',
-		minWidth: 0,
+		// minWidth: 0,
 		maxWidth: '100%',
 		transition: 'box-shadow 150ms ease, transform 150ms ease',
 		'&:hover': {
@@ -35,7 +35,7 @@ const styles = cssMap({
 		},
 	},
 	dragging: {
-		opacity: 0.55,
+		// opacity: 0.55,
 		cursor: 'grabbing',
 		boxShadow: token('elevation.shadow.overlay'),
 		},
@@ -103,10 +103,12 @@ export function MatrixIssueCard({ issue, location, score }: MatrixIssueCardProps
 	return (
 		<Box ref={ref} xcss={cx(styles.card, isDragging && styles.dragging)}>
 			<Stack space="space.100">
-				<Text size="small" weight="bold" tone="subtle">
+				{/* <Text size="small" weight="bold" tone="subtle"> */}
+				<Text size="small" weight="bold">
 					{issue.key}
 				</Text>
-				<Heading as="h3" size="small" xcss={styles.summary}>
+				{/* <Heading as="h3" size="small" xcss={styles.summary}> */}
+				<Heading as="h3" size="small">
 					{issue.summary}
 				</Heading>
 				<Inline space="space.100" alignBlock="center">
@@ -114,7 +116,8 @@ export function MatrixIssueCard({ issue, location, score }: MatrixIssueCardProps
 						{issue.status}
 					</Lozenge>
 					{issue.priorityName && (
-						<Text size="small" tone="subtle">
+						// <Text size="small" tone="subtle">
+						<Text size="small">
 							{issue.priorityName}
 						</Text>
 					)}
