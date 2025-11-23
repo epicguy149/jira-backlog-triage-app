@@ -32,6 +32,18 @@ type EpicsResponse = {
     }>;
 };
 
+type IssueParent = {
+    [key: string]: unknown;
+    parent?: {
+        key?: string;
+        fields?: {
+            issuetype?: {
+                name?: string;
+            };
+        };
+    };
+};
+
 async function fetchBoardEpicMetadata(
     boardId: string | number,
 ): Promise<Map<string, EpicMeta>> {
@@ -80,7 +92,7 @@ async function fetchBoardEpicMetadata(
 }
 
 function parseEpicKey(issue: JiraIssue, epicLinkFieldId: string | null): string | null {
-    const fields = issue.fields as any;
+    const fields = issue.fields as IssueParent;
 
     if (epicLinkFieldId && typeof fields[epicLinkFieldId] === 'string') {
         return fields[epicLinkFieldId] as string;
@@ -177,7 +189,7 @@ export async function getBacklog(
     const epicMetaByKey = await fetchBoardEpicMetadata(boardId);
 
     const swipeIssues = issues.map((issue) => {
-        const fields = issue.fields as any;
+        const fields = issue.fields as IssueParent;
 
         const epicKey = parseEpicKey(issue, epicLinkFieldId);
         const epicMeta = epicKey ? epicMetaByKey.get(epicKey) : undefined;

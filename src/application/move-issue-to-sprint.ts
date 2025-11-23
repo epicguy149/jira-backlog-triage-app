@@ -40,7 +40,7 @@ export async function moveIssueToSprint(
         const sprint = sprints[0];
         const sprintId = sprint.id;
 
-        var bodyData = JSON.stringify({ issues: [issueIdOrKey] });
+        const bodyData = JSON.stringify({ issues: [issueIdOrKey] });
 
         const res = await api.asUser().requestJira(route`/rest/agile/1.0/sprint/${sprintId}/issue`, {
             method: 'POST',
