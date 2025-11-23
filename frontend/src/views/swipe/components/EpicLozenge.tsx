@@ -12,6 +12,7 @@ export const DEFAULT_EPIC_COLOR: ColorPair = {
 };
 
 // TODO: add more mappings
+// Note: colour tokens on Jira dont match actual atlaskit design tokens, had to manually map for purple
 export const EPIC_COLORS: Record<string, ColorPair> = {
     color_7: { 
         bg: '#EED7FC', 
