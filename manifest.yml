@@ -15,14 +15,6 @@ modules:
       title: Log Juggler
       layout: blank
 
-  jira:globalPage:
-    - key: log-juggler-global
-      resource: main
-      resolver: { function: resolver }
-      viewportSize: large
-      title: Log Juggler
-      layout: blank
-
   function:
     - key: resolver
       handler: presentation/index.handler
@@ -51,6 +43,7 @@ permissions:
     - read:issue-details:jira
     - write:sprint:jira-software
     - read:sprint:jira-software
+    - read:epic:jira-software
     
   content:
     scripts:

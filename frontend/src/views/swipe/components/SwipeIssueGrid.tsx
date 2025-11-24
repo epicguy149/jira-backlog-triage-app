@@ -9,7 +9,7 @@ const styles = cssMap({
 	grid: {
 		backgroundColor: token('color.background.accent.gray.subtlest'),
 		paddingBlock: token('space.150'),
-    	paddingInline: token('space.150'),
+		paddingInline: token('space.150'),
 	}
 })
 

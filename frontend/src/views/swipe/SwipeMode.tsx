@@ -12,15 +12,15 @@ import { SwipeIssueGrid } from '../swipe/components/SwipeIssueGrid';
 import { SwipeToolbar } from '../swipe/components/SwipeToolbar';
 import { cssMap } from '@atlaskit/css';
 import { token } from '@atlaskit/tokens';
-import { useEffect, useCallback, Fragment } from 'react';
-import Lozenge from '@atlaskit/lozenge';
+import { useEffect, useCallback, Fragment, useState } from 'react';
 import Spinner from '@atlaskit/spinner';
 import EmptyState from '@atlaskit/empty-state';
-import noResultsImg from './images/no-results.png';
-import emptyBacklogImg from './images/empty-backlog.png';
-import errorImg from './images/error.png';
 import type { SwipeIssue } from '~contracts/api';
 import type { SwipeDirection } from '../swipe/swipe-types';
+
+const noResultsImg = new URL('./images/no-results.png', import.meta.url).href;
+const emptyBacklogImg = new URL('./images/empty-backlog.png', import.meta.url).href;
+const errorImg = new URL('./images/error.png', import.meta.url).href;
 
 // maxResults value
 const ISSUES_PER_PAGE = 20;
@@ -105,6 +105,12 @@ export default function SwipeMode() {
         isLoading: isContextLoading,
         error: contextError,
     } = useJiraContext();
+
+	const [selectedIssue, setSelectedIssue] = useState<SwipeIssue | null>(null);
+
+	const handleIssueClick = useCallback((issue: SwipeIssue) => {
+		setSelectedIssue(issue);
+	}, []);
 
     // initial loading
     useEffect(() => {
@@ -209,7 +215,7 @@ export default function SwipeMode() {
 
             const actionType: 'retain' | 'delete' | 'move-to-sprint' =
 				direction === 'left' ? 'delete'
-	            : direction === 'up' ? 'move-to-sprint'
+				: direction === 'up' ? 'move-to-sprint'
 				: 'retain';
 
             const originalIssues = swipePage.issues;
@@ -496,7 +502,7 @@ export default function SwipeMode() {
             <Box xcss={styles.container}>
                 <Stack space="space.100" alignInline="center">
                     <Spinner size='large' label="Loading Context" />
-                    <Lozenge appearance="new">Loading Context...</Lozenge>
+                    <Text size="medium">Loading Context...</Text>
                 </Stack>
             </Box>
         );
@@ -507,7 +513,7 @@ export default function SwipeMode() {
             return <ErrorState message={swipeError} />;
         }
 
-        if (isSwipeLoading && !swipePage) {
+        if (isSwipeLoading && (!swipePage || issuesToShow.length === 0)) {
             return (
                 <Stack xcss={styles.centered}>
                     <Spinner size="large" label='Loading issues...' />
@@ -524,10 +530,27 @@ export default function SwipeMode() {
             return <EmptyBacklogState />;
         }
 
-        return <SwipeIssueGrid 
-            issues={issuesToShow} 
-            onIssueSwipe={handleIssueSwipe}
-        />;
+        return (
+			<>
+				<SwipeIssueGrid
+					issues={issuesToShow}
+					selectedIssueId={selectedIssue?.id ?? null}
+					onIssueClick={handleIssueClick}
+					onIssueSwipe={handleIssueSwipe}
+				/>
+				{/* for card focus modal, atlaskit modal has bug or i just cant find way to make modal a window, always renders in fullscreen */}
+				{/* TODO: find way to make modal open in window */}
+{/* 
+				<ModalTransition>
+					{selectedIssue && (
+						<SwipeIssueModal
+						issue={selectedIssue}
+						onClose={() => setSelectedIssue(null)}
+						/>
+					)}
+				</ModalTransition> */}
+			</>
+		)
     };
 
     return (

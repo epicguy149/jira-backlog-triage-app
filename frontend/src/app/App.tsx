@@ -7,7 +7,7 @@ import SwipeMode from '../views/swipe/SwipeMode';
 import MatrixMode from '../views/matrix/MatrixMode';
 import { Box, Stack } from '@atlaskit/primitives';
 import Spinner from '@atlaskit/spinner';
-import Lozenge from '@atlaskit/lozenge';
+import Tag from '@atlaskit/tag'
 import { 
   Root, 
   Banner, 
@@ -30,6 +30,7 @@ function AppRouter() {
     case 'matrix': 
       return <MatrixMode />;
     case 'loading':
+      break;
       
     default:       
       return <SwipeMode />;
@@ -97,7 +98,7 @@ function App() {
       <Box padding="space.400">
         <Stack space= "space.200" alignInline="center">
           <Spinner size='large' label="Loading" />
-          <Lozenge appearance="new">Loading...</Lozenge>
+          <Tag color="purple" text="Loading..."/>
         </Stack>
       </Box>
     )
@@ -119,7 +120,8 @@ function App() {
       >
         <AppTopNav />
       </TopNav>
-
+      
+      {/* defaultCollapsed is officially stated to be deprecated, but sidenav is not collapsed on launch without it */}
       {view === 'swipe' && (
         <SideNav defaultCollapsed>
           <SwipeSideNav />

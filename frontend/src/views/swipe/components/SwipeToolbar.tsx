@@ -13,6 +13,7 @@ import DropdownMenu, {
 	DropdownItemCheckboxGroup,
 } from '@atlaskit/dropdown-menu';
 import Badge from '@atlaskit/badge';
+import { cssMap } from '@atlaskit/css';
 
 const SearchIconBefore = () => (
 	<Box paddingInlineStart="space.100">
@@ -23,6 +24,12 @@ const SearchIconBefore = () => (
 const filterItemStyles = xcss({
 	flex: '0 0 auto',
 });
+
+const styles = cssMap({
+    searchContainer: {
+        flexGrow: 1 
+    }
+})
 
 export function SwipeToolbar() {
     const { 
@@ -77,7 +84,7 @@ export function SwipeToolbar() {
 
     return (
         <Inline space="space.200" alignBlock="center">
-            <Box xcss={{ flexGrow: 1 }}>
+            <Box xcss={styles.searchContainer}>
                 <Textfield 
                     placeholder="Search backlog"
                     elemBeforeInput={<SearchIconBefore />}

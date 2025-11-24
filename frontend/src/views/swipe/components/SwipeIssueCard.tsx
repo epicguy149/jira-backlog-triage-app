@@ -1,5 +1,4 @@
-import React from 'react';
-import Lozenge from '@atlaskit/lozenge';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@atlaskit/avatar';
 import Tooltip from '@atlaskit/tooltip';
 import Badge from '@atlaskit/badge';
@@ -7,13 +6,25 @@ import SprintIcon from '@atlaskit/icon/core/sprint';
 import DeleteIcon from '@atlaskit/icon/core/delete';
 import BacklogIcon from '@atlaskit/icon/core/backlog';
 import Link from '@atlaskit/link';
-import { Inline, Stack, Text, Pressable, Box } from '@atlaskit/primitives';
+import { Inline, Stack, Pressable, Box } from '@atlaskit/primitives';
 import { cssMap, cx } from '@atlaskit/css';
 import { token } from '@atlaskit/tokens';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
 import type { SwipeDirection } from '../swipe-types';
 import type { SwipeIssue } from '~contracts/api';
 import { useAppContext } from 'frontend/src/app/AppContext';
+import InlineEdit from '@atlaskit/inline-edit';
+import Textfield from '@atlaskit/textfield';
+import { fetchPriorities, JiraPriority, updateIssue } from 'frontend/src/api/jira-client';
+import TextArea from '@atlaskit/textarea';
+import DropdownMenu, {
+  DropdownItem,
+  DropdownItemGroup,
+} from '@atlaskit/dropdown-menu';
+import { EpicLozenge } from './EpicLozenge';
+import { IconButton } from '@atlaskit/button/new';
+import Lozenge from '@atlaskit/lozenge';
+import Image from '@atlaskit/image'
 
 const MotionPressable = motion(Pressable);
 
@@ -26,7 +37,7 @@ const styles = cssMap({
     card: {
         display: 'flex',
         flexDirection: 'column',
-        paddingBlockStart: token('space.150'),
+        // paddingBlockStart: token('space.150'),
 		paddingBlockEnd: token('space.150'),
 		paddingInline: token('space.150'),
         color: token('color.text'),
@@ -38,6 +49,8 @@ const styles = cssMap({
         position: 'relative',
         height: '100%',
         width: '100%',
+        touchAction: 'none',
+        zIndex: 1,
         transition:
 			'transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out',
 		'&:hover': {
@@ -49,6 +62,9 @@ const styles = cssMap({
 			transform: 'translateY(0)',
 			boxShadow: token('elevation.shadow.raised'),
 		}
+    },
+    cardEditing: {
+        zIndex: 800,
     },
     selected: {
 		backgroundColor: token('elevation.surface.raised.pressed'),
@@ -64,11 +80,48 @@ const styles = cssMap({
         width: '100%',
         zIndex: 0,
     },
-    indicator: {
-        display: 'flex',
-        height: '100%',
+    indicatorStack: {
+        height:'100%',
+    },
+    storyPointEditView: {
+        width: '60px',
+        alignItems: 'center',
+        zIndex: 800,
+        justifyContent: 'center'
     }
 })
+
+const containerStyles = cssMap({
+	root: {
+		// eslint-disable-next-line @atlaskit/ui-styling-standard/no-unsafe-values
+		// width: '70%' as any,
+        paddingBlockEnd: token('space.150'),
+	},
+});
+
+const readViewContainerStyles = cssMap({
+	root: {
+		font: token('font.body'),
+		// eslint-disable-next-line @atlaskit/ui-styling-standard/no-unsafe-values
+		// minHeight: '3em' as string,
+		// paddingTop: token('space.075'),
+		paddingRight: token('space.075'),
+		paddingBottom: token('space.075'),
+		paddingLeft: token('space.075'),
+		wordBreak: 'break-word',
+	},
+});
+
+const overlayStyles = cssMap({
+    summaryOverlay: {
+        position: 'relative',
+        zIndex: 800,
+    },
+    storyPointsOverlay: {
+        position: 'relative',
+        zIndex: 800,
+    },
+});
 
 type Props = {
     issue: SwipeIssue;
@@ -78,24 +131,24 @@ type Props = {
     isSwiping?: boolean;
 }
 
-function statusAppearance(
-    status: string,
-): React.ComponentProps<typeof Lozenge>['appearance'] {
-    // handles to do, done, in progress for now,
-    // if needed will add more
-    if (status.includes('To Do')) {
-        return 'default';
-    }
+// function statusAppearance(
+//     status: string,
+// ): React.ComponentProps<typeof Lozenge>['appearance'] {
+//     // handles to do, done, in progress for now,
+//     // if needed will add more
+//     if (status.includes('To Do')) {
+//         return 'default';
+//     }
 
-    if (status.includes('Done')) {
-        return 'success';
-    }
+//     if (status.includes('Done')) {
+//         return 'success';
+//     }
 
-    if (status.includes('In Progress')) {
-        return 'inprogress';
-    }
-    return 'default';
-}
+//     if (status.includes('In Progress')) {
+//         return 'inprogress';
+//     }
+//     return 'default';
+// }
 
 // for indicator, commit, flyout distance
 const PREVIEW_THRESHOLD = 60;
@@ -148,6 +201,12 @@ function computeVelocityDirection(vx: number, vy: number): SwipeDirection | null
     return null;
 }
 
+type PriorityOption = {
+    label: string;
+    value: string;
+    iconUrl?: string;
+};
+
 export function SwipeIssueCard({ 
     issue,
     isSelected,
@@ -155,9 +214,85 @@ export function SwipeIssueCard({
     onSwipe,
     isSwiping,
 }: Props) {
+    const [activeDirection, setActiveDirection] = useState<SwipeDirection | null>(null);
+    const [summary, setSummary] = useState(issue.summary);
+    const [storyPoints, setStoryPoints] = useState<number | null>(
+        issue.storyPoints ?? null,
+    );
+    const [priorityOptions, setPriorityOptions] = useState<PriorityOption[]>([]);
+    const { jiraBaseUrl, updateIssueInPage, setBanner } = useAppContext();
+    const [isSummaryEditing, setIsSummaryEditing] = useState(false);
+    const [isStoryPointsEditing, setIsStoryPointsEditing] = useState(false);
+
     const controls = useAnimation();
-    const [activeDirection, setActiveDirection] = React.useState<SwipeDirection | null>(null);
     const showIndicators = activeDirection !== null && !isSwiping;
+
+    const isEditing = isSummaryEditing || isStoryPointsEditing;
+
+    useEffect(() => {
+        setSummary(issue.summary);
+        setStoryPoints(issue.storyPoints ?? null);
+    }, [issue.summary, issue.storyPoints]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadPriorities() {
+            try {
+                const data = await fetchPriorities();
+                if (cancelled) return;
+
+                setPriorityOptions(
+                    data.map((p: JiraPriority) => ({
+                        label: p.name,
+                        value: p.id,
+                        iconUrl: p.iconUrl,
+                    })),
+                );
+            } catch {
+                if (!cancelled) {
+                    setBanner({
+                        message: 'Failed to load priorities',
+                        type: 'warning',
+                    });
+                }
+            }
+        }
+
+        void loadPriorities();
+            return () => {
+            cancelled = true;
+        };
+    }, [setBanner]);
+
+    const currentPriorityOption: PriorityOption | null = issue.priorityId && issue.priorityName ? {
+        label: issue.priorityName,
+        value: issue.priorityId,
+        iconUrl: issue.priorityIconUrl ?? undefined,
+    } : null;
+
+    const handlePrioritySelect = async (opt: PriorityOption) => {
+        const res = await updateIssue({
+            issueIdOrKey: issue.key,
+            priorityId: opt.value,
+        });
+
+        if (res.error) {
+            setBanner({ message: res.error, type: 'error' });
+            return;
+        }
+
+        updateIssueInPage(issue.key, {
+            priorityId: opt.value,
+            priorityName: opt.label,
+            priorityIconUrl: opt.iconUrl ?? null,
+        });
+
+        setBanner({
+            message: `Updated ${issue.key} priority`,
+            type: 'announcement',
+        });
+    };
 
     const handleDrag = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
         if (isSwiping) {
@@ -250,27 +385,26 @@ export function SwipeIssueCard({
     };
     
     const handleClick = () => {
+        if (isSwiping) return;
         onClick?.(issue);
     };
 
-
-    const { jiraBaseUrl } = useAppContext();
     const issueKey = issue.key;
     const issueHref = `${jiraBaseUrl}/browse/${issueKey}`;
 
     return (
         <Box xcss={styles.wrapper}>
+            {/* indicators under card */}
             {showIndicators && (
-                <Box xcss={styles.indicatorContainer}>
-                    <Stack alignBlock="center" grow="fill" xcss={{height:'100%'}}>
-                        {/* TODO: fix swipe up vertical alignment, should be at bottom */}
-                        <Inline space="space.200" spread="space-between" alignBlock='center' grow='fill'>
+                <Box xcss={styles.indicatorContainer} paddingBlockEnd='space.300'>
+                    <Stack alignBlock={activeDirection === 'up' ? 'end' : 'center'} grow="fill" xcss={styles.indicatorStack}>
+                        <Inline space="space.200" spread="space-between" alignBlock={activeDirection === 'up' ? 'end' : 'center'} grow='fill'>
                             {/* swipe left */}
                             <Stack alignInline="center" space="space.050" alignBlock='center'>
                                 {activeDirection === 'right' && (
                                     <>
                                         <BacklogIcon label="retain" />
-                                        <Lozenge>Keep</Lozenge>
+                                        <Lozenge isBold>Keep</Lozenge>
                                     </>
                                 )}
                             </Stack>
@@ -280,7 +414,7 @@ export function SwipeIssueCard({
                                 {activeDirection === 'up' && (
                                     <>
                                         <SprintIcon label="move-to-sprint" />
-                                        <Lozenge appearance="inprogress">Move to sprint</Lozenge>
+                                        <Lozenge appearance="inprogress" isBold>Move to sprint</Lozenge>
                                     </>
                                 )}
                             </Stack>
@@ -290,7 +424,7 @@ export function SwipeIssueCard({
                                 {activeDirection === 'left' && (
                                     <>
                                         <DeleteIcon label="delete" />
-                                        <Lozenge appearance="removed">Delete</Lozenge>
+                                        <Lozenge appearance="removed" isBold>Delete</Lozenge>
                                     </>
                                 )}
                             </Stack>
@@ -298,36 +432,87 @@ export function SwipeIssueCard({
                     </Stack>
                 </Box>
             )}
+
+            {/* card */}
             <MotionPressable
                 onClick={handleClick}
-                xcss={cx(styles.card, isSelected && styles.selected)}
-                drag
+                xcss={cx(styles.card, isSelected && styles.selected, isEditing && styles.cardEditing)}
+                drag={!isEditing}
                 dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
                 dragElastic={0.3}
                 onDrag={handleDrag}
                 onDragEnd={handleDragEnd}
                 animate={controls}
                 whileTap={{ scale: 1.02 }}
-                style={{
-                    touchAction: 'none',
-                    zIndex: 1
-                }}
             > 
-                {/* card */}
                 <Stack space="space.025" spread="space-between" grow="fill">
-                    <Stack space="space.100">
-                        <Text weight='medium'>{issue.summary}</Text>
+                    <Stack space="space.025">
+                        <Box 
+                            xcss={cx(containerStyles.root, overlayStyles.summaryOverlay)} 
+                            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+                            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+                        >
+                            <InlineEdit
+                                isRequired
+                                defaultValue={summary}
+                                editButtonLabel={summary || 'Add summary'}
+                                onEdit={() => setIsSummaryEditing(true)}
+                                onCancel={() => setIsSummaryEditing(false)}
+                                editView={({ ...fieldProps }, ref) => (
+                                    // @ts-expect-error - textarea does not pass through ref as a prop
+                                    <TextArea {...fieldProps} ref={ref} appearance="standard" resize="none"/>
+                                )}
+                                readView={() => (
+                                    <Box xcss={readViewContainerStyles.root}>
+                                        {summary || 'Add summary'}
+                                    </Box>
+                                )}
+                                onConfirm={async (value: string) => {
+                                    const trimmed = value.trim();
+                                    if (!trimmed || trimmed === summary) {
+                                        setIsSummaryEditing(false);
+                                        return;
+                                    }
+
+                                    const res = await updateIssue({
+                                        issueIdOrKey: issue.key,
+                                        summary: trimmed,
+                                    });
+
+                                    if (res.error) {
+                                        setBanner({ message: res.error, type: 'error' });
+                                        setIsSummaryEditing(false);
+                                        return;
+                                    }
+
+                                    setSummary(trimmed);
+                                    updateIssueInPage(issue.key, { summary: trimmed });
+
+                                    setBanner({
+                                        message: `${issue.key} summary updated`,
+                                        type: 'announcement',
+                                    });
+
+                                    setIsSummaryEditing(false);
+                                }}
+                                keepEditViewOpenOnBlur
+                                readViewFitContainerWidth
+                            />
+                        </Box>
                         <div>
-                            <Lozenge appearance="default" isBold>
-                                EPIC
-                            </Lozenge>
+                            {issue.epicKey && issue.epicSummary && (
+                                <EpicLozenge 
+                                    text={issue.epicSummary || issue.epicKey}
+                                    colorKey={issue.epicColor} 
+                                />
+                            )}
                         </div>
                     </Stack>
 
                     <Inline alignBlock="center" spread="space-between">
                         <Inline space="space.050" alignBlock='center'>
                             {issue.issueTypeIconUrl && (
-                                <img
+                                <Image
                                 src={issue.issueTypeIconUrl}
                                 alt=""
                                 width={16}
@@ -335,26 +520,130 @@ export function SwipeIssueCard({
                                 />
                             )}
 
-                            {/* TODO: find way to change colour to subtle, wrapping in text doesn't work */}
-                            <Link href={issueHref} appearance="subtle">
+                            <Link href={issueHref} appearance="subtle" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation()}>
                                 {issue.key}
-                            </Link>
-                            
+                            </Link>                            
                         </Inline>
 
-                        <Inline space="space.050" alignBlock="center">
+                        <Inline alignBlock="center">
                             {/* <Lozenge appearance={statusAppearance(issue.status)} isBold>
                                 {issue.status}
                             </Lozenge> */}
-                            <Badge>0</Badge>
-                            {issue.priorityName && issue.priorityIconUrl && issue.issueTypeName != 'Task' && (
-                                <img
-                                src={issue.priorityIconUrl}
-                                alt=""
-                                width={16}
-                                height={16}
-                                />
-                            )}
+
+                            {/* for story point */}
+                            <Inline 
+                                xcss={overlayStyles.storyPointsOverlay}
+                                alignBlock='center'
+                            >
+                                {storyPoints && (
+                                    <InlineEdit 
+                                        defaultValue={String(storyPoints)}
+                                        onEdit={() => setIsStoryPointsEditing(true)}
+                                        onCancel={() => setIsStoryPointsEditing(false)}
+                                        readView={() => (
+                                            <Box paddingBlockEnd='space.050'>
+                                                <Badge>
+                                                    {storyPoints}
+                                                </Badge>
+                                            </Box>
+                                        )}
+                                        editView={({ ...fieldProps }) => (
+                                            <Box xcss={styles.storyPointEditView}>
+                                                <Textfield 
+                                                    {...fieldProps}
+                                                    autoFocus
+                                                    isCompact
+                                                    type="number"
+                                                />
+                                            </Box>
+                                        )}
+                                        onConfirm={async (value: string) => {
+                                            const trimmed = value.trim();
+                                            let parsed: number | null = storyPoints;
+
+                                            if (trimmed === '') {
+                                                parsed = null;
+                                            } else {
+                                                const n = Number(trimmed);
+                                                if (Number.isNaN(n)) {
+                                                    setIsStoryPointsEditing(false);
+                                                    return;
+                                                }
+                                                parsed = n;
+                                            }
+
+                                            const res = await updateIssue({
+                                                issueIdOrKey: issue.key,
+                                                storyPoints: parsed,
+                                            });
+
+                                            if (res.error) {
+                                                setBanner({ message: res.error, type: 'error' });
+                                                setIsStoryPointsEditing(false);
+                                                return;
+                                            }
+
+                                            setStoryPoints(parsed);
+                                            updateIssueInPage(issue.key, { storyPoints: parsed });
+
+                                            setBanner({
+                                                message: `Updated ${issue.key} story points`,
+                                                type: 'announcement',
+                                            });
+
+                                            setIsStoryPointsEditing(false);
+                                        }}
+                                    />
+                                )}
+                            </Inline>
+
+                            {issue.issueTypeName != 'Task' && (<DropdownMenu 
+                                zIndex={999}
+                                trigger={({ triggerRef, ...triggerProps }) => (
+                                    <IconButton
+                                        {...triggerProps}
+                                        ref={triggerRef as React.Ref<HTMLButtonElement>}
+                                        appearance="subtle"
+                                        label={currentPriorityOption?.label ?? 'Priority'}
+                                        icon={() =>
+                                            currentPriorityOption?.iconUrl ? (
+                                            <Image
+                                                src={currentPriorityOption.iconUrl}
+                                                alt=""
+                                                width={16}
+                                                height={16}
+                                            />
+                                            ) : null
+                                        }
+                                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                            e.stopPropagation();
+                                            triggerProps.onClick?.(e);
+                                        }}
+                                        spacing="compact"
+                                    />
+                                )}
+                            >
+                                <DropdownItemGroup>
+                                    {priorityOptions.map((opt) => (
+                                    <DropdownItem
+                                        key={opt.value}
+                                        elemBefore={
+                                            opt.iconUrl ? (
+                                                <Image
+                                                src={opt.iconUrl}
+                                                alt=""
+                                                width={16}
+                                                height={16}
+                                                />
+                                            ) : undefined
+                                        }
+                                        onClick={() => void handlePrioritySelect(opt)}
+                                    >
+                                        {opt.label}
+                                    </DropdownItem>
+                                    ))}
+                                </DropdownItemGroup>
+                            </DropdownMenu>)}
                             <Tooltip content={issue.assigneeDisplayName}>
                                 <Avatar
                                     size="small"

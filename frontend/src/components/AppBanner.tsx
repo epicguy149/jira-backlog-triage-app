@@ -9,6 +9,7 @@ import Tooltip from '@atlaskit/tooltip';
 import { Inline, Text } from '@atlaskit/primitives';
 import CrossIcon from '@atlaskit/icon/core/cross';
 import { token } from '@atlaskit/tokens';
+import { useState, useEffect } from 'react';
 
 const icons = {
     warning: <WarningIcon label="Warning" />,
@@ -18,6 +19,12 @@ const icons = {
 
 export default function AppBanner() {
     const { banner, actionHistory, setHistoryActionRequest, setBanner, } = useAppContext();
+    const [isUndoLoading, setIsUndoLoading] = useState(false);
+
+    useEffect(() => {
+        setIsUndoLoading(false);
+    }, [banner]);
+
     if (!banner) {
         return null;
     }
@@ -56,9 +63,11 @@ export default function AppBanner() {
                             <Button
                                 appearance="primary"
                                 isDisabled={undoDisabled}
+                                isLoading={isUndoLoading}
                                 onClick={() => {
                                     if (!undoDisabled && undoItem) {
                                         setHistoryActionRequest({ item: undoItem, op: 'undo' });
+                                        setIsUndoLoading(true);
                                     }
                                 }}
                             >
