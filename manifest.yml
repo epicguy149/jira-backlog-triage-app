@@ -26,7 +26,7 @@ resources:
       port: 1234
 
 app:
-  id: ari:cloud:ecosystem::app/3bd57274-9cf0-4669-a26b-cea953a174ec
+  id: ari:cloud:ecosystem::app/64accdc2-5cad-48b7-b259-894666e86ee8
   runtime:
     name: nodejs20.x
 
@@ -44,7 +44,7 @@ permissions:
     - write:sprint:jira-software
     - read:sprint:jira-software
     - read:epic:jira-software
-    
+
   content:
     scripts:
       - unsafe-inline
