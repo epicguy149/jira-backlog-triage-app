@@ -2,6 +2,7 @@ import { useEffect} from 'react';
 import '@atlaskit/css-reset';
 import { useAppContext } from './AppContext';
 import { useJiraContext } from '../hooks/useJiraContext';
+import { fetchServerInfo } from '../api/jira-client';
 import SwipeMode from '../views/swipe/SwipeMode';
 import MatrixMode from '../views/matrix/MatrixMode';
 import { Box, Stack } from '@atlaskit/primitives';
@@ -36,7 +37,7 @@ function AppRouter() {
 }
 
 function App() {
-  const { view, setView, isSettingsOpen, setBanner, banner} = useAppContext();
+  const { view, setView, isSettingsOpen, setBanner, banner, jiraBaseUrl, setJiraBaseUrl } = useAppContext();
   const { boardId, projectId, isLoading, error } = useJiraContext();
 
   useEffect(() => {
@@ -65,6 +66,31 @@ function App() {
       }
     }
   }, [isLoading, error, boardId, projectId, view, setView, setBanner]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadServerInfo() {
+      try {
+        const info = await fetchServerInfo();
+        if (!cancelled) {
+          setJiraBaseUrl(info.baseUrl || null);
+        }
+      } catch {
+        if (!cancelled) {
+          setJiraBaseUrl(null);
+        }
+      }
+    }
+
+    if (!jiraBaseUrl) {
+      void loadServerInfo();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [jiraBaseUrl, setJiraBaseUrl]);
 
   if (isLoading || view === 'loading') {
     return (

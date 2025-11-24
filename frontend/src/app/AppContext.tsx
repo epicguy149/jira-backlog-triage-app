@@ -7,6 +7,10 @@ import {
     type SetStateAction 
 } from 'react';
 import type { SwipeIssuePage, SwipeFilterState } from '~contracts/api';
+import type { ActionHistoryItem } from '../views/swipe/swipe-types';
+
+// maintain last 20 actions
+const MAX_HISTORY_COUNT = 20;
 
 export type View = 'loading' | 'swipe' | 'matrix';
 
@@ -40,11 +44,21 @@ interface IAppContext {
     setIsSwipeLoading: (value: boolean) => void;
     swipeError: string | null;
     setSwipeError: (value: string | null) => void;
+
+    // search
     searchQuery: string;
     setSearchQuery: (query: string) => void;
 
+    // filter
     swipeFilters: SwipeFilterState;
     setSwipeFilters: Dispatch<SetStateAction<SwipeFilterState>>;
+
+    // history / undo 
+    actionHistory: ActionHistoryItem[];
+    addActionHistory: (item: Omit<ActionHistoryItem, 'id' | 'timestamp'>) => void;
+
+    jiraBaseUrl: string | null;
+    setJiraBaseUrl: (url: string | null) => void;
 }
 
 const AppContext = createContext<IAppContext | undefined>(undefined);
@@ -60,6 +74,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [swipeFilters, setSwipeFilters] = useState<SwipeFilterState>(filtersInitialState);
+
+    // for action history item id
+    const [nextHistoryId, setNextHistoryId] = useState(1);
+    const [actionHistory, setActionHistory] = useState<ActionHistoryItem[]>([]);
+
+    const [jiraBaseUrl, setJiraBaseUrl] = useState<string | null>(null);
+
+    const addActionHistory = (item: Omit<ActionHistoryItem, 'id' | 'timestamp'>) => {
+        setActionHistory((prev) => {
+            // KEY-id
+            const id = `${item.key}-${nextHistoryId}`;
+            const full: ActionHistoryItem = {
+                ...item,
+                id,
+                timestamp: Date.now(),
+            };
+
+            const next = [full, ...prev];
+            return next.slice(0, MAX_HISTORY_COUNT);
+        });
+
+        setNextHistoryId((n) => n + 1);
+    };
 
     const value = {
         view,
@@ -78,6 +115,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setSearchQuery,
         swipeFilters,
         setSwipeFilters,
+        nextHistoryId,
+        setNextHistoryId,
+        actionHistory,
+        addActionHistory,
+        jiraBaseUrl,
+        setJiraBaseUrl,
     };
 
     return (
