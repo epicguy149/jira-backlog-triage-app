@@ -1,0 +1,12 @@
+// babel.config.js
+{
+  "plugins": [
+    // This will handle all `token()` calls outside of Compiled
+    "@atlaskit/tokens/babel-plugin",
+    // ↓↓ Compiled should run last ↓↓
+    [
+      "@compiled/babel-plugin",
+      { "transformerBabelPlugins": ["@atlaskit/tokens/babel-plugin"] }
+    ],
+  ],
+}
