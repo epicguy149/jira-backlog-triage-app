@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Lozenge from '@atlaskit/lozenge';
 import Avatar from '@atlaskit/avatar';
 import Tooltip from '@atlaskit/tooltip';
 import Badge from '@atlaskit/badge';
@@ -7,7 +6,7 @@ import SprintIcon from '@atlaskit/icon/core/sprint';
 import DeleteIcon from '@atlaskit/icon/core/delete';
 import BacklogIcon from '@atlaskit/icon/core/backlog';
 import Link from '@atlaskit/link';
-import { Inline, Stack, Text, Pressable, Box } from '@atlaskit/primitives';
+import { Inline, Stack, Pressable, Box } from '@atlaskit/primitives';
 import { cssMap, cx } from '@atlaskit/css';
 import { token } from '@atlaskit/tokens';
 import { motion, useAnimation, type PanInfo } from 'framer-motion';
@@ -24,6 +23,8 @@ import DropdownMenu, {
 } from '@atlaskit/dropdown-menu';
 import { EpicLozenge } from './EpicLozenge';
 import { IconButton } from '@atlaskit/button/new';
+import Lozenge from '@atlaskit/lozenge';
+import Image from '@atlaskit/image'
 
 const MotionPressable = motion(Pressable);
 
@@ -48,6 +49,8 @@ const styles = cssMap({
         position: 'relative',
         height: '100%',
         width: '100%',
+        touchAction: 'none',
+        zIndex: 1,
         transition:
 			'transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out',
 		'&:hover': {
@@ -59,6 +62,9 @@ const styles = cssMap({
 			transform: 'translateY(0)',
 			boxShadow: token('elevation.shadow.raised'),
 		}
+    },
+    cardEditing: {
+        zIndex: 800,
     },
     selected: {
 		backgroundColor: token('elevation.surface.raised.pressed'),
@@ -74,9 +80,14 @@ const styles = cssMap({
         width: '100%',
         zIndex: 0,
     },
-    indicator: {
-        display: 'flex',
-        height: '100%',
+    indicatorStack: {
+        height:'100%',
+    },
+    storyPointEditView: {
+        width: '60px',
+        alignItems: 'center',
+        zIndex: 800,
+        justifyContent: 'center'
     }
 })
 
@@ -92,7 +103,7 @@ const readViewContainerStyles = cssMap({
 	root: {
 		font: token('font.body'),
 		// eslint-disable-next-line @atlaskit/ui-styling-standard/no-unsafe-values
-		minHeight: '3em' as any,
+		// minHeight: '3em' as string,
 		// paddingTop: token('space.075'),
 		paddingRight: token('space.075'),
 		paddingBottom: token('space.075'),
@@ -120,24 +131,24 @@ type Props = {
     isSwiping?: boolean;
 }
 
-function statusAppearance(
-    status: string,
-): React.ComponentProps<typeof Lozenge>['appearance'] {
-    // handles to do, done, in progress for now,
-    // if needed will add more
-    if (status.includes('To Do')) {
-        return 'default';
-    }
+// function statusAppearance(
+//     status: string,
+// ): React.ComponentProps<typeof Lozenge>['appearance'] {
+//     // handles to do, done, in progress for now,
+//     // if needed will add more
+//     if (status.includes('To Do')) {
+//         return 'default';
+//     }
 
-    if (status.includes('Done')) {
-        return 'success';
-    }
+//     if (status.includes('Done')) {
+//         return 'success';
+//     }
 
-    if (status.includes('In Progress')) {
-        return 'inprogress';
-    }
-    return 'default';
-}
+//     if (status.includes('In Progress')) {
+//         return 'inprogress';
+//     }
+//     return 'default';
+// }
 
 // for indicator, commit, flyout distance
 const PREVIEW_THRESHOLD = 60;
@@ -386,14 +397,14 @@ export function SwipeIssueCard({
             {/* indicators under card */}
             {showIndicators && (
                 <Box xcss={styles.indicatorContainer} paddingBlockEnd='space.300'>
-                    <Stack alignBlock={activeDirection === 'up' ? 'end' : 'center'} grow="fill" xcss={{height:'100%'}}>
+                    <Stack alignBlock={activeDirection === 'up' ? 'end' : 'center'} grow="fill" xcss={styles.indicatorStack}>
                         <Inline space="space.200" spread="space-between" alignBlock={activeDirection === 'up' ? 'end' : 'center'} grow='fill'>
                             {/* swipe left */}
                             <Stack alignInline="center" space="space.050" alignBlock='center'>
                                 {activeDirection === 'right' && (
                                     <>
                                         <BacklogIcon label="retain" />
-                                        <Lozenge>Keep</Lozenge>
+                                        <Lozenge isBold>Keep</Lozenge>
                                     </>
                                 )}
                             </Stack>
@@ -403,7 +414,7 @@ export function SwipeIssueCard({
                                 {activeDirection === 'up' && (
                                     <>
                                         <SprintIcon label="move-to-sprint" />
-                                        <Lozenge appearance="inprogress">Move to sprint</Lozenge>
+                                        <Lozenge appearance="inprogress" isBold>Move to sprint</Lozenge>
                                     </>
                                 )}
                             </Stack>
@@ -413,7 +424,7 @@ export function SwipeIssueCard({
                                 {activeDirection === 'left' && (
                                     <>
                                         <DeleteIcon label="delete" />
-                                        <Lozenge appearance="removed">Delete</Lozenge>
+                                        <Lozenge appearance="removed" isBold>Delete</Lozenge>
                                     </>
                                 )}
                             </Stack>
@@ -425,7 +436,7 @@ export function SwipeIssueCard({
             {/* card */}
             <MotionPressable
                 onClick={handleClick}
-                xcss={cx(styles.card, isSelected && styles.selected)}
+                xcss={cx(styles.card, isSelected && styles.selected, isEditing && styles.cardEditing)}
                 drag={!isEditing}
                 dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
                 dragElastic={0.3}
@@ -433,10 +444,6 @@ export function SwipeIssueCard({
                 onDragEnd={handleDragEnd}
                 animate={controls}
                 whileTap={{ scale: 1.02 }}
-                style={{
-                    touchAction: 'none',
-                    zIndex: isEditing ? 800 : 1,
-                }}
             > 
                 <Stack space="space.025" spread="space-between" grow="fill">
                     <Stack space="space.025">
@@ -451,8 +458,8 @@ export function SwipeIssueCard({
                                 editButtonLabel={summary || 'Add summary'}
                                 onEdit={() => setIsSummaryEditing(true)}
                                 onCancel={() => setIsSummaryEditing(false)}
-                                editView={({ errorMessage, ...fieldProps }, ref) => (
-                                    // @ts-ignore - textarea does not pass through ref as a prop
+                                editView={({ ...fieldProps }, ref) => (
+                                    // @ts-expect-error - textarea does not pass through ref as a prop
                                     <TextArea {...fieldProps} ref={ref} appearance="standard" resize="none"/>
                                 )}
                                 readView={() => (
@@ -489,7 +496,7 @@ export function SwipeIssueCard({
                                     setIsSummaryEditing(false);
                                 }}
                                 keepEditViewOpenOnBlur
-				                readViewFitContainerWidth
+                                readViewFitContainerWidth
                             />
                         </Box>
                         <div>
@@ -505,7 +512,7 @@ export function SwipeIssueCard({
                     <Inline alignBlock="center" spread="space-between">
                         <Inline space="space.050" alignBlock='center'>
                             {issue.issueTypeIconUrl && (
-                                <img
+                                <Image
                                 src={issue.issueTypeIconUrl}
                                 alt=""
                                 width={16}
@@ -540,16 +547,15 @@ export function SwipeIssueCard({
                                                 </Badge>
                                             </Box>
                                         )}
-                                        editView={({ errorMessage, ...fieldProps }) => (
-                                            <div style={{ width: '60px', alignItems: 'center', zIndex: 800, justifyContent: 'center' }}>
+                                        editView={({ ...fieldProps }) => (
+                                            <Box xcss={styles.storyPointEditView}>
                                                 <Textfield 
                                                     {...fieldProps}
                                                     autoFocus
                                                     isCompact
                                                     type="number"
-                                                    style={{ width: '100%' }}
                                                 />
-                                            </div>
+                                            </Box>
                                         )}
                                         onConfirm={async (value: string) => {
                                             const trimmed = value.trim();
@@ -601,7 +607,7 @@ export function SwipeIssueCard({
                                         label={currentPriorityOption?.label ?? 'Priority'}
                                         icon={() =>
                                             currentPriorityOption?.iconUrl ? (
-                                            <img
+                                            <Image
                                                 src={currentPriorityOption.iconUrl}
                                                 alt=""
                                                 width={16}
@@ -623,7 +629,7 @@ export function SwipeIssueCard({
                                         key={opt.value}
                                         elemBefore={
                                             opt.iconUrl ? (
-                                                <img
+                                                <Image
                                                 src={opt.iconUrl}
                                                 alt=""
                                                 width={16}

@@ -40,21 +40,21 @@ export function SwipeIssueModal({ issue, onClose }: Props) {
             <ModalTitle>Custom modal footer</ModalTitle>
         </ModalHeader>
         <ModalBody>
-            <p>
+            <Text>
                 If you wish to customise a modal dialog, it accepts any valid React element as
                 children.
-            </p>
+            </Text>
 
-            <p>
+            <Text>
                 Modal header accepts any valid React element as children, so you can use modal title
                 in conjunction with other elements like an exit button in the top right.
-            </p>
+            </Text>
 
-            <p>
+            <Text>
                 Modal footer accepts any valid React element as children. For example, you can add
                 an avatar in the footer. For very custom use cases, you can achieve the same thing
                 without modal footer.
-            </p>
+            </Text>
         </ModalBody>
         <CustomFooter />
     </Modal>

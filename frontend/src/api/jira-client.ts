@@ -78,7 +78,7 @@ export async function fetchServerInfo(): Promise<ServerInfo> {
     throw new Error(`failed to fetch serverInfo: ${res.status} ${text}`);
   }
 
-  const data = await res.json() as any;
+  const data = await res.json() as { baseUrl: string };
 
   return {
     baseUrl: data.baseUrl,

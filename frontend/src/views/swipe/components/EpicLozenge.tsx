@@ -37,17 +37,13 @@ export const EpicLozenge = ({ text, colorKey }: Props) => {
 
     return (
         <Box
-            style={{
-                color: styles.bg,
-                borderRadius: '3px',
-                padding: '1px 4px',
-                width: 'fit-content',
-                maxWidth: '100%',
-                alignItems: 'center',
-                backgroundColor: styles.bg
-            }}
+            // eslint-disable-next-line @atlaskit/ui-styling-standard/enforce-style-prop
+            style={{ color: styles.bg, borderRadius: '3px', width: 'fit-content', maxWidth: '100%', alignItems: 'center', backgroundColor: styles.bg }}
+            paddingBlock='space.025'
+            paddingInline='space.050'
         >
             <Text size='small' weight='bold'>
+                {/* eslint-disable-next-line @atlaskit/ui-styling-standard/enforce-style-prop */}
                 <span style={{ color: styles.text, textTransform: 'uppercase', fontSize: '11px', }}>
                     {text}
                 </span>
