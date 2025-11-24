@@ -13,6 +13,7 @@ modules:
       resolver: { function: resolver }
       viewportSize: large
       title: Log Juggler
+      layout: blank
 
   jira:globalPage:
     - key: log-juggler-global
@@ -20,6 +21,7 @@ modules:
       resolver: { function: resolver }
       viewportSize: large
       title: Log Juggler
+      layout: blank
 
   function:
     - key: resolver
@@ -43,6 +45,11 @@ permissions:
     - read:jira-user
     - manage:jira-project
     - manage:jira-configuration
+  content:
+    scripts:
+      - unsafe-inline
+    styles:
+      - unsafe-inline
 
 # external:
 #   # NOTE: for API keys, use forge variables set, read using process.env.PERPLEXITY_API_KEY
