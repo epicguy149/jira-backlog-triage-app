@@ -2,7 +2,7 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 import { cssMap, cx } from '@atlaskit/css';
 import Heading from '@atlaskit/heading';
-import { Box, Grid, Stack } from '@atlaskit/primitives';
+import { Box, Grid, Inline, Stack } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
 import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import invariant from 'tiny-invariant';
@@ -14,12 +14,6 @@ import { type MatrixCoord, type MatrixScore, type PlacementMap, isMatrixIssueDra
 
 const gridStyles = cssMap({
 	layout: {
-		display: 'grid',
-		gridTemplateColumns: 'auto 1fr auto',
-		gridTemplateRows: 'auto 1fr auto',
-		gap: token('space.200'),
-		alignItems: 'center',
-		justifyItems: 'center',
 		maxWidth: '1200px',
 		marginInline: 'auto',
 	},
@@ -38,31 +32,12 @@ const gridStyles = cssMap({
 	grid: {
 		width: '100%',
 	},
-
-	// these are styles for the lables around teh grid
-	topLabel: {
-		gridColumn: '2 / 3',
-		gridRow: '1 / 2',
-	},
-	bottomLabel: {
-		gridColumn: '2 / 3',
-		gridRow: '3 / 4',
-	},
-	leftLabel: {
-		gridColumn: '1 / 2',
-		gridRow: '2 / 3',
+	verticalLabel: {
 		writingMode: 'vertical-rl',
 		transform: 'rotate(180deg)',
 	},
-	rightLabel: {
-		gridColumn: '3 / 4',
-		gridRow: '2 / 3',
-		writingMode: 'vertical-rl',
-	},
-
-	centerCell: {
-		gridColumn: '2 / 3',
-		gridRow: '2 / 3',
+	topBottomLabel: {
+		textAlign: 'center',
 		width: '100%',
 	},
 });
@@ -108,7 +83,7 @@ type MatrixCellProps = {
 
 	coord: MatrixCoord;
 	children: ReactNode;
-}; // 
+}; 
 
 // This links each individual square (drop target) in the grid to pragmatic DnD
 //
@@ -150,9 +125,8 @@ function MatrixCell({ coord, children }: MatrixCellProps) {
 	);
 }
 
- // MatrixGrid is basd off of le chessboard tutorial example for pragmatic drag and drop
- // Each cell is a drop target that captures issue placements,, issues are grouped by coordinates
-//
+ // MatrixGrid is basd off of the chessboard tutorial example from Atlassian Design system pragmatic drag and drop
+ // Each cell is a drop target that captures issue placements, issues are grouped by coordinates
 export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridProps) {
 
 	const columnTemplate = useMemo(
@@ -181,52 +155,55 @@ export function MatrixGrid({ gridSize, issues, placements, scores }: MatrixGridP
 		return map; 
 	}, [issues, placements]);
 
+	// render/ grid draw
 	return (
-		//grid render
-		// also includees the lables indicating impact/effort around the grid
+
 		<Box xcss={gridStyles.layout}>
-			<Box xcss={gridStyles.topLabel}>
-				<Heading size="medium">Most Impact</Heading>
-			</Box>
+			<Stack space="space.100" alignInline="center">
+				<Box xcss={gridStyles.topBottomLabel}>
+					<Heading size="medium">Most Impact</Heading>
+				</Box>
 
-			<Box xcss={gridStyles.leftLabel}>
-				<Heading size="medium">Most Effort</Heading>
-			</Box>
-			<Box xcss={cx(gridStyles.container, gridStyles.centerCell)}>
-				<Grid gap="space.150" templateColumns={columnTemplate} xcss={gridStyles.grid}>
-					{Array.from({ length: gridSize }).map((_, row) => (
-					        // Le epic render grid from an array
-						Array.from({ length: gridSize }).map((_, col) => {
+				<Inline space="space.150" alignBlock="center">
+					<Heading size="medium" xcss={gridStyles.verticalLabel}>
+						Most Effort
+					</Heading>
+					<Box xcss={gridStyles.container}>
+						<Grid gap="space.150" templateColumns={columnTemplate} xcss={gridStyles.grid}>
+							{Array.from({ length: gridSize }).map((_, row) =>
+								Array.from({ length: gridSize }).map((_, col) => {
+									const coord: MatrixCoord = { row, col };
+									const location = { type: 'grid' as const, coord };
+									const key = `${row}-${col}`;
+									const cellIssues = cellIssueMap.get(key) ?? [];
 
-							const coord: MatrixCoord = { row, col };
-							const location = { type: 'grid' as const, coord };
-							const key = `${row}-${col}`; 
-							const cellIssues = cellIssueMap.get(key) ?? [];
+									return (
+										<MatrixCell key={key} coord={coord}>
+											{cellIssues.map((issue) => (
+												<MatrixIssueCard
+													key={issue.id}
+													issue={issue}
+													location={location}
+													score={scores[issue.id]}
+												/>
+											))}
+										</MatrixCell>
 
-							return ( 
-								<MatrixCell key={key} coord={coord}> 
-									{cellIssues.map((issue) => (
-										<MatrixIssueCard
-											key={issue.id}
-											issue={issue}
-											location={location}
-											score={scores[issue.id]} 
-										/>
+									);
+								}),
+							)}
+						</Grid>
+					</Box>
+					<Heading size="medium" xcss={gridStyles.verticalLabel}>
+						Least Effort
+					</Heading>
+				</Inline>
 
-									))} 
-								</MatrixCell> 
-							); 
-						})
-					))} 
-				</Grid>
-
-			</Box>
-			<Box xcss={gridStyles.rightLabel}>
-				<Heading size="medium">Least Effort</Heading>
-			</Box>
-			<Box xcss={gridStyles.bottomLabel}>
-				<Heading size="medium">Least Impact</Heading>
-			</Box>
+				<Box xcss={gridStyles.topBottomLabel}>
+					<Heading size="medium">Least Impact</Heading>
+				</Box>
+			</Stack>
 		</Box>
-	); 
+
+	);
 }

@@ -67,7 +67,8 @@ function Message({ title, body }: MessageProps) {
 	);
 }
 
-// borrowed from swipe mode
+// MatrixMode uses the same state objects as swipe mode, that it gets from AppContext
+// so it doesnt have to maintain its own cache of backlog items and loads quickly
 export default function MatrixMode() {
 	const {
 		swipePage,
@@ -84,7 +85,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 	const [placements, setPlacements] = useState<PlacementMap>({});
 	const [scores, setScores] = useState<Record<string, MatrixScore>>({});
 
-	// initial load I stole from Swipe mode,  fetches the first page of backlog issues
+	// fetches the first page of backlog issues
 	useEffect(() => {
 		if (contextError) {
 			setSwipeError(contextError);
@@ -98,7 +99,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 		let cancelled = false;
 
 
-		// this shit was from swipe
+		// Matrix uses same states as swipe
 		async function loadMatrixData() {
 
 			try {
@@ -150,7 +151,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 	const issues = swipePage?.issues ?? [];
 
-	// whenever the page of issuess changes ensure each issue has a placement entry
+	// whenever the page of issues changes ensure each issue has a placement entry
 	useEffect(() => {
 
 		if (issues.length === 0) {
@@ -219,9 +220,8 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 		return monitorForElements({ 
 			onDrop({ source, location }) {
-				const dragData = source.data; // 1. Capture data in a variable
+				const dragData = source.data;
 
-				// 2. Check the variable (narrowing its type for the rest of the function)
 				if (!isMatrixIssueDragData(dragData)) {
 					return;
 				} 
@@ -236,7 +236,6 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 				if (isMatrixCellDropData(dropData)) {
 
 					setPlacements((prev) => { 
-						// 3. Use dragData instead of source.data
 						const prevPlacement = prev[dragData.issueId];
 						if (
 							prevPlacement &&
@@ -345,7 +344,9 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 			return <Message title="No backlog items to rank" body="Switch filters or search to load issues." />;
 		}
 
+		// render
 		return (
+
 			<Box xcss={styles.layout}>
 				<Box xcss={styles.benchColumn}>
 					<MatrixBench issues={benchIssues} />

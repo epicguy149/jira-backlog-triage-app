@@ -65,9 +65,9 @@ function statusAppearance(status: string): React.ComponentProps<typeof Lozenge>[
 	return 'default';
 }
 
-	//
-	// Renders draggable tile using atlaskit drag n drop
-	// 
+//
+// Renders draggable tile using atlaskit drag n drop
+// 
 export function MatrixIssueCard({ issue, location, score }: MatrixIssueCardProps) {
 
 	const ref = useRef<HTMLDivElement | null>(null);
@@ -103,12 +103,12 @@ export function MatrixIssueCard({ issue, location, score }: MatrixIssueCardProps
 	return (
 		<Box ref={ref} xcss={cx(styles.card, isDragging && styles.dragging)}>
 			<Stack space="space.100">
-				{/* <Text size="small" weight="bold" tone="subtle"> */}
+
 				<Text size="small" weight="bold">
 					{issue.key}
 				</Text>
-				{/* <Heading as="h3" size="small" xcss={styles.summary}> */}
 				<Heading as="h3" size="small">
+
 					{issue.summary}
 				</Heading>
 				<Inline space="space.100" alignBlock="center">
