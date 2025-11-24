@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { view } from '@forge/bridge';
 import AtlaskitAppProvider from '@atlaskit/app-provider';
 import '@atlaskit/css-reset';
-import App from './App';
-import { AppProvider } from './AppContext';
+import App from './app/App';
+import { AppProvider } from './app/AppContext';
 
 view.theme.enable();
 

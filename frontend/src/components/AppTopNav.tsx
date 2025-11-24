@@ -1,8 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { useAppContext, type View } from '../AppContext';
+import { useAppContext, type View } from '../app/AppContext';
 import { 
-  TopNavStart, 
-  TopNavMiddle, 
+  TopNavStart,
   TopNavEnd, 
   SideNavToggleButton,
   Help

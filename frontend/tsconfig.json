@@ -5,9 +5,11 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@compiled/react",
     "noEmit": true,
-    "paths": {
-      "~contracts/*": ["../contracts/*"]
-    }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "build",
+    ".parcel-cache",
+  ]
 }
