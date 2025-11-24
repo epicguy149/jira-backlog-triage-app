@@ -4,14 +4,15 @@ import {
   TopNavStart,
   TopNavEnd, 
   SideNavToggleButton,
-  Help
+  Help,
+  AppLogo,
 } from '@atlaskit/navigation-system';
 import { TopNavButton } from '@atlaskit/navigation-system/experimental/top-nav-button';
-import { Settings} from '@atlaskit/navigation-system/top-nav-items';
+import { CustomTitle, Settings} from '@atlaskit/navigation-system/top-nav-items';
 import GridIcon from '@atlaskit/icon/core/grid';
 import ChangesIcon from '@atlaskit/icon/core/changes';
 import AiChatIcon from '@atlaskit/icon/core/ai-chat';
-import Heading from '@atlaskit/heading';
+import { JiraIcon } from '@atlaskit/logo';
 
 export default React.memo(function AppTopNav() {
     const { view, setView, isSettingsOpen, setIsSettingsOpen, setBanner } = useAppContext();
@@ -53,17 +54,15 @@ export default React.memo(function AppTopNav() {
                 />
 
                 {/* app name doenst render for some reason */}
-                {/* <AppLogo
+                <AppLogo
 					href="https://jira.atlassian.com"
-					icon={AtlassianIcon}
-					name="Log Juggler"
+					icon={JiraIcon}
+					name="Jira"
 					label="App name"
-				/> */}
-
-                <Heading size="medium" color="color.text.inverse">Log Juggler</Heading>
+				/>
                 
                 {/* ADS beta feature - doesn't work*/}
-                {/* <CustomTitle>Log Juggler</CustomTitle> */}
+                <CustomTitle>Log Juggler</CustomTitle>
                 
                 <TopNavButton iconBefore={ChangesIcon} onClick={() => changeView('swipe')}>Swipe</TopNavButton>
 

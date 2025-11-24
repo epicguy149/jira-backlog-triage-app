@@ -8,11 +8,16 @@ import {
   type DeleteIssueResponse,
   MoveIssueToSprintRequestSchema,
   type MoveIssueToSprintResponse,
+  MoveIssueToBacklogRequestSchema,
+  type MoveIssueToBacklogResponse,
 } from '../../contracts/api';
-import { getBacklog } from '../application/get-backlog';
-import { setIssueSwiped } from '../application/set-swiped';
-import { deleteIssue } from '../application/delete-issue';
-import { moveIssueToSprint } from '../application/move-issue-to-sprint';
+import { 
+  getBacklog,
+  setIssueSwiped,
+  deleteIssue,
+  moveIssueToSprint,
+  moveIssueToBacklog,
+} from '../application';
 
 const resolver = new Resolver();
 
@@ -48,6 +53,14 @@ resolver.define(
     const payload = MoveIssueToSprintRequestSchema.parse(req.payload);
 
     return moveIssueToSprint(payload);
+  },
+);
+
+resolver.define(
+  'moveIssueToBacklog',
+  async (req): Promise<MoveIssueToBacklogResponse> => {
+    const payload = MoveIssueToBacklogRequestSchema.parse(req.payload);
+    return moveIssueToBacklog(payload);
   },
 );
 

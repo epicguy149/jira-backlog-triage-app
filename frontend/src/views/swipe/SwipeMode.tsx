@@ -6,6 +6,7 @@ import {
 	setIssueSwiped,
 	deleteIssue,
 	moveIssueToSprint,
+    moveIssueToBacklog,
 } from '../../api/jira-client';
 import { SwipeIssueGrid } from '../swipe/components/SwipeIssueGrid';
 import { SwipeToolbar } from '../swipe/components/SwipeToolbar';
@@ -94,6 +95,9 @@ export default function SwipeMode() {
         searchQuery,
         swipeFilters,
         addActionHistory,
+        disableHistoryItem,
+        historyActionRequest,
+        setHistoryActionRequest,
     } = useAppContext();
 
     const {
@@ -102,6 +106,7 @@ export default function SwipeMode() {
         error: contextError,
     } = useJiraContext();
 
+    // initial loading
     useEffect(() => {
         if (contextError) {
             setSwipeError(contextError);
@@ -162,10 +167,32 @@ export default function SwipeMode() {
         swipeFilters,
     ]);
 
-    const issuesToShow = swipePage?.issues ?? [];
+    const issuesToShow = (swipePage?.issues ?? []).filter((issue) => {
+		const { unswiped, swiped } = swipeFilters.status;
+
+		// show all
+		if (unswiped && swiped) {
+			return true;
+		}
+
+		// only unswiped
+		if (unswiped && !swiped) {
+			return !issue.swiped;
+		}
+
+		// only swiped
+		if (!unswiped && swiped) {
+			return issue.swiped;
+		}
+
+		return false;
+	});
 
     const handleIssueSwipe = useCallback(
-		async (issue: SwipeIssue, direction: SwipeDirection): Promise<boolean> => {
+		async (
+            issue: SwipeIssue,
+            direction: SwipeDirection,
+        ): Promise<boolean> => {
 			if (!boardId) {
 				setBanner({
 					type: 'error',
@@ -174,6 +201,10 @@ export default function SwipeMode() {
 				return false;
 			}
 
+            if (!swipePage) {
+                return false;
+            }
+
 			const issueKey = issue.key;
 
             const actionType: 'retain' | 'delete' | 'move-to-sprint' =
@@ -181,16 +212,181 @@ export default function SwipeMode() {
 	            : direction === 'up' ? 'move-to-sprint'
 				: 'retain';
 
+            const originalIssues = swipePage.issues;
+            
+            // optimistically remove from grid immediately after swipe
+            setSwipePage({
+                ...swipePage,
+                issues: originalIssues.filter((i) => i.id !== issue.id),
+            });
+
+            try {
+                let sprintName: string | undefined;
+
+                if (actionType === 'delete') {
+                    const res = await deleteIssue({ issueIdOrKey: issueKey });
+
+                    if (res.error) {
+                        throw new Error(res.error);
+                    }
+                } else if (actionType === 'move-to-sprint') {
+                    const res = await moveIssueToSprint({
+                        boardId,
+                        issueIdOrKey: issueKey,
+                    });
+
+                    if (res.error) {
+                        throw new Error(res.error);
+                    }
+
+                    sprintName = res.sprintName;
+                }
+
+                const swipedRes = await setIssueSwiped({
+                    boardId,
+                    issueKey,
+                    swiped: true,
+                });
+
+                if (!swipedRes.swiped) {
+                    throw new Error('Failed to mark issue as swiped');
+                }
+                
+                // add history and receive item generated
+                const historyItem = addActionHistory({
+                    key: issueKey,
+                    type: actionType,
+                    sprintName,
+                });
+
+                // set banner message for action taken
+                let msg: string;
+                if (actionType === 'delete') {
+                    msg = `${issueKey} deleted`;
+                } else if (actionType === 'retain') {
+                    msg = `${issueKey} retained in backlog`;
+                } else {
+                    const sprint = sprintName || 'active sprint';
+                    msg = `${issueKey} moved to ${sprint}`;
+                }
+
+                setBanner({
+                    type: 'announcement',
+                    message: msg,
+                    undoHistoryId: historyItem.id,
+                });
+
+                return true;
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : 'unknown error';
+
+                if (swipePage) {
+                    setSwipePage({
+                        ...swipePage,
+                        issues: originalIssues,
+                    });
+                }
+
+                setBanner({
+                    type: 'error',
+                    message: `Failed to apply action for ${issue.key}: ${msg}`,
+                });
+
+                return false;
+            }
+		},
+		[boardId, setBanner, setSwipePage, addActionHistory, swipePage],
+	);
+
+    // handles history action (flyout actions)
+    useEffect(() => {
+		if (!historyActionRequest) {
+			return;
+		}
+
+		if (!boardId) {
+			setBanner({
+				type: 'error',
+				message: 'No board in context',
+			});
+			setHistoryActionRequest(null);
+			return;
+		}
+
+		const { item, op } = historyActionRequest;
+		const issueKey = item.key;
+
+		void (async () => {
 			try {
-				let sprintName: string | undefined;
+				if (op === 'undo') {
 
-				if (actionType === 'delete') {
-					const res = await deleteIssue({ issueIdOrKey: issueKey });
-
-					if (res.error) {
-						throw new Error(res.error);
+                    // cant undo deleted issues
+					if (item.type === 'delete') {
+						throw new Error('Cannot undo delete action');
 					}
-				} else if (actionType === 'move-to-sprint') {
+
+					if (item.type === 'retain') {
+						// unswipe
+						const res = await setIssueSwiped({
+							boardId,
+							issueKey,
+							swiped: false,
+						});
+
+						if (res.swiped !== false) {
+							throw new Error('Failed to unswipe issue');
+						}
+					} else if (item.type === 'move-to-sprint') {
+						// move back to backlog and unswipe
+						const moveRes = await moveIssueToBacklog({
+							boardId,
+							issueIdOrKey: issueKey,
+						});
+
+						if (moveRes.error) {
+							throw new Error(moveRes.error);
+						}
+
+						const res = await setIssueSwiped({
+							boardId,
+							issueKey,
+							swiped: false,
+						});
+
+						if (res.swiped !== false) {
+							throw new Error('Failed to unswipe issue');
+						}
+					}
+
+					// reload page to reinsert card back into grid
+					const page = await fetchBacklog({
+						boardId,
+						startAt: 0,
+						maxResults: ISSUES_PER_PAGE,
+						searchQuery,
+						filters: swipeFilters,
+					});
+
+					setSwipePage(page);
+
+					// disable all buttons in history action flyout
+					disableHistoryItem(item.id);
+					
+					const undoMsg = item.type === 'retain' ? `${issueKey} unswiped`
+						: `${issueKey} moved back to backlog`;
+
+					addActionHistory({
+						key: issueKey,
+						type: item.type,
+						sprintName: item.sprintName,
+						label: undoMsg,
+					});
+
+					setBanner({
+						type: 'announcement',
+						message: undoMsg,
+					});
+				} else if (op === 'move-to-sprint') {
 					const res = await moveIssueToSprint({
 						boardId,
 						issueIdOrKey: issueKey,
@@ -200,63 +396,100 @@ export default function SwipeMode() {
 						throw new Error(res.error);
 					}
 
-					sprintName = res.sprintName;
+					const swipedRes = await setIssueSwiped({
+						boardId,
+						issueKey,
+						swiped: true,
+					});
+
+					if (!swipedRes.swiped) {
+						throw new Error('Failed to mark issue as swiped');
+					}
+
+					// remove from grid if on grid
+					// if (swipePage) {
+					// 	setSwipePage({
+					// 		...swipePage,
+					// 		issues: swipePage.issues.filter((i) => i.key !== issueKey),
+					// 	});
+					// }
+
+					disableHistoryItem(item.id);
+
+					const newHistory = addActionHistory({
+						key: issueKey,
+						type: 'move-to-sprint',
+						sprintName: res.sprintName,
+					});
+
+					const msg = `${issueKey} moved to ${res.sprintName}`;
+
+					setBanner({
+						type: 'announcement',
+						message: msg,
+						undoHistoryId: newHistory.id,
+					});
+				} else if (op === 'delete') {
+					// delete from history
+					const res = await deleteIssue({ issueIdOrKey: issueKey });
+					if (res.error) {
+						throw new Error(res.error);
+					}
+
+					const swipedRes = await setIssueSwiped({
+						boardId,
+						issueKey,
+						swiped: true,
+					});
+					if (!swipedRes.swiped) {
+						throw new Error('Failed to mark issue as swiped');
+					}
+
+					if (swipePage) {
+						setSwipePage({
+							...swipePage,
+							issues: swipePage.issues.filter((i) => i.key !== issueKey),
+						});
+					}
+
+					disableHistoryItem(item.id);
+
+					const newHistory = addActionHistory({
+						key: issueKey,
+						type: 'delete',
+					});
+
+					const msg = `${issueKey} deleted`;
+					setBanner({
+						type: 'announcement',
+						message: msg,
+						undoHistoryId: newHistory.id,
+					});
 				}
-
-				const swipedRes = await setIssueSwiped({
-					boardId,
-					issueKey,
-					swiped: true,
-				});
-
-				if (!swipedRes.swiped) {
-					throw new Error('Failed to mark issue as swiped');
-				}
-
-                // remove immediately on swipe
-                // dont wait for server side refilter
-				if (swipePage) {
-                    const nextIssues = swipePage.issues.filter((i) => i.id !== issue.id);
-                    setSwipePage({ ...swipePage, issues: nextIssues });
-                }
-                
-                // add to history
-				addActionHistory({
-					key: issueKey,
-					type: actionType,
-					sprintName,
-				});
-
-				// set banner message for action taken
-				let msg: string;
-				if (actionType === 'delete') {
-					msg = `${issueKey} deleted`;
-				} else if (actionType === 'retain') {
-					msg = `${issueKey} retained in backlog`;
-				} else {
-					const sprint = sprintName || 'active sprint';
-					msg = `${issueKey} moved to ${sprint}`;
-				}
-
-				setBanner({
-					type: 'announcement',
-					message: msg,
-				});
-
-				return true;
 			} catch (err) {
-				const msg = err instanceof Error ? err.message : 'unknown error';
+				const msg =
+					err instanceof Error ? err.message : 'Unknown error applying action';
 
 				setBanner({
 					type: 'error',
-					message: `Failed to apply action for ${issue.key}: ${msg}`,
+					message: `Failed applying action for ${issueKey}: ${msg}`,
 				});
-
-				return false;
+			} finally {
+				setHistoryActionRequest(null);
 			}
-		},
-		[boardId, setBanner, setSwipePage, addActionHistory],
-	);
+		})();
+	}, [
+		historyActionRequest,
+		boardId,
+		searchQuery,
+		swipeFilters,
+		swipePage,
+		setSwipePage,
+		setBanner,
+		setHistoryActionRequest,
+		disableHistoryItem,
+		addActionHistory,
+	]);
 
     if (isContextLoading) {
         return (
@@ -291,7 +524,7 @@ export default function SwipeMode() {
             return <EmptyBacklogState />;
         }
 
-         return <SwipeIssueGrid 
+        return <SwipeIssueGrid 
             issues={issuesToShow} 
             onIssueSwipe={handleIssueSwipe}
         />;
