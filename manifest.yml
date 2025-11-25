@@ -34,7 +34,7 @@ resources:
       port: 1234
 
 app:
-  id: ari:cloud:ecosystem::app/b8d8a131-503a-444c-85d2-280a481a04c2
+  id: ari:cloud:ecosystem::app/cac521ae-aa28-4b84-bb89-b0e45860e7ca
   runtime:
     name: nodejs20.x
 
