@@ -7,19 +7,15 @@ jest.mock("tiny-invariant", () => ({
   },
 }));
 
-let lastOnDrop: any = null;
 
 jest.mock("@atlaskit/pragmatic-drag-and-drop/element/adapter", () => ({
-  __esModule: true,
 
   dropTargetForElements: ({ onDrop }: any) => {
-    lastOnDrop = onDrop;
     return () => {};
   },
 
   draggable: () => () => {},
 
-  __test: { getLastOnDrop: () => lastOnDrop },
 }));
 
 const mockCssMap = (styles: any) =>
