@@ -31,12 +31,12 @@ export function buildJqlQuery(options: JqlBuilderOptions): string | null {
     const swipedKeys = Array.from(swipedSet);
     
     if (swipedKeys.length > 0) {
-        const keyList = swipedKeys.join(',');
+        const keyList = swipedKeys.map((k) => `"${k}"`).join(',');
         
         if (showUnswiped && !showSwiped) {
-            jqlClauses.push(`key NOT IN (${keyList})`);
+            jqlClauses.push(`issuekey  NOT IN (${keyList})`);
         } else if (!showUnswiped && showSwiped) {
-            jqlClauses.push(`key IN (${keyList})`);
+            jqlClauses.push(`issuekey  IN (${keyList})`);
         }
     } else if (!showUnswiped && showSwiped) {
         return null; 

@@ -16,77 +16,121 @@ import DeleteIcon from '@atlaskit/icon/core/delete';
 import { LinkButton } from '@atlaskit/button/new';
 import LinkExternalIcon from '@atlaskit/icon/core/link-external';
 import ToolTip from '@atlaskit/tooltip';
+import type { ActionHistoryItem } from '../swipe-types';
+import { useAppContext } from 'frontend/src/app/AppContext';
+import { Box, Text } from '@atlaskit/primitives';
 
-const exampleHref = "http://www.bitbucket.com"
+function getActionMessage(item: ActionHistoryItem): string {
+    // for undo messages
+    if (item.label) {
+        return item.label;
+    }
 
-type ActionType = 'MOVED' | 'DELETED' | 'RETAINED';
+    const { key, type, sprintName } = item;
 
-/**
- * 
- * In real app, take props to determine which actions/issues to show
- * 
- * refer: https://community.atlassian.com/forums/Jira-questions/How-can-I-get-an-issue-url-that-can-be-navigated-to-in-the/qaq-p/1500948
- * for getting jira issue link
- * 
- * for each action made by user, add menu item e.g.: PROJ-12 (href = issuelinkfromabove) flyout -> UNDO + other actions
- * also fetch latest sprint, for moved to actions
- */
+    switch(type) {
+        case 'delete':
+            return `${key} deleted`;
+        case 'retain':
+            return `${key} retained in backlog`;
+        case 'move-to-sprint':
+            return `${key} moved to ${sprintName}`;
+        default:
+            return 'no action - bug';
+    }
+}
 
-const ActionHistoryFlyout = ({ issueKey, type }: {issueKey: string, type: 'MOVED' | 'DELETED' | 'RETAINED' }) => (
-    <FlyoutMenuItemContent>
-        {/* link to issue */}
-        <MenuSection>
-            <MenuList>
-                <ToolTip content="Requires right click -> Open in new tab or middle mouse button to open in new tab">
-                    <LinkButton iconAfter={LinkExternalIcon} href={exampleHref} target="_blank">
-                        View {issueKey}
-                    </LinkButton >
-                </ToolTip>
-                
-            </MenuList>
-        </MenuSection>
+type ActionHistoryFlyoutProps = {
+  item: ActionHistoryItem;
+};
 
-        {/* actions section  */}
-        <MenuSection>
-            <MenuSectionHeading>Actions</MenuSectionHeading>
-            <MenuList>
-                <ButtonMenuItem 
-                    elemBefore={<UndoIcon label="Undo" />}
-                    onClick={() => console.log(`undo ${issueKey}`)}
-                >
-                    Undo
-                </ButtonMenuItem>
+const ActionHistoryFlyout = ({ item }: ActionHistoryFlyoutProps) => {
+    const { jiraBaseUrl, setHistoryActionRequest } = useAppContext();
+    const { key, type, disabled } = item;
+    const issueHref = `${jiraBaseUrl}/browse/${key}`;
 
-                {type !== 'MOVED' && (
-                    <ButtonMenuItem 
-                        elemBefore={<SprintIcon label="Move to sprint" />}
-                        onClick={() => console.log(`move ${issueKey} to sprint x`)}
-                    >
-                        Move to Sprint
-                    </ButtonMenuItem>
-                )}
+    const isDeleteAction = type === 'delete';
+    const allDisabled = disabled || isDeleteAction;
 
-                {type !== 'DELETED' && (
-                    <ButtonMenuItem 
-                        elemBefore={<DeleteIcon label="Delete" />}
-                        onClick={() => console.log(`delete ${issueKey}`)}
-                    >
-                        Delete
-                    </ButtonMenuItem>
-                )}
-            </MenuList>
-        </MenuSection>
-    </FlyoutMenuItemContent>
-)
+    const undoTooltip = isDeleteAction ? 'Cannot undo delete' : disabled ?
+        'The action for this history has already been applied' : 'Undo this action';
+
+    const moveTooltip = isDeleteAction ? 'Issue has already been deleted' : disabled ?
+        'The action for this history has already been applied' : 'Move this issue to sprint';
+
+    const deleteTooltip = isDeleteAction ? 'Issue has already been deleted' : disabled ?
+        'The action for this history has already been applied' : 'Delete this issue';
+
+    return (
+        <FlyoutMenuItemContent>
+            {/* link to issue */}
+            <MenuSection>
+                <MenuList>
+                    <ToolTip content="Requires right click -> Open in new tab or middle mouse button to open in new tab">
+                        <LinkButton iconAfter={LinkExternalIcon} href={issueHref} target="_blank" isDisabled={allDisabled}>
+                            View {key}
+                        </LinkButton >
+                    </ToolTip>
+                </MenuList>
+            </MenuSection>
+
+            {/* actions section  */}
+            <MenuSection>
+                <MenuSectionHeading>Actions</MenuSectionHeading>
+                <MenuList>
+                    <ToolTip content={undoTooltip}>
+                        <ButtonMenuItem 
+                            elemBefore={<UndoIcon label="Undo" />}
+                            isDisabled={allDisabled}
+                            onClick={() => {
+                             if (!allDisabled) {
+                                setHistoryActionRequest({ item, op: 'undo' });
+                            }
+                          }}
+                        >
+                            Undo
+                        </ButtonMenuItem>
+                    </ToolTip>
+
+                    {type !== 'move-to-sprint' && (
+                        <ToolTip content={moveTooltip}>
+                            <ButtonMenuItem 
+                                elemBefore={<SprintIcon label="Move to sprint" />}
+                                isDisabled={allDisabled}
+                                onClick={() => {
+                                    if (!allDisabled) {
+                                        setHistoryActionRequest({ item, op: 'move-to-sprint' });
+                                    }
+                                }}
+                            >
+                                Move to Sprint
+                            </ButtonMenuItem>
+                        </ToolTip>
+                    )}
+
+                    {type !== 'delete' && (
+                        <ToolTip content={deleteTooltip}>
+                            <ButtonMenuItem 
+                                elemBefore={<DeleteIcon label="Delete" />}
+                                isDisabled={allDisabled}
+                                onClick={() => {
+                                    if (!allDisabled) {
+                                        setHistoryActionRequest({ item, op: 'delete' });
+                                    }
+                                }}
+                            >
+                                Delete
+                            </ButtonMenuItem>
+                        </ToolTip>
+                    )}
+                </MenuList>
+            </MenuSection>
+        </FlyoutMenuItemContent>
+    )
+}
 
 export default function SwipeSideNav() {
-
-    // hardcoded example issues for prototyping
-    const actionHistory: {key: string, text: string, type: ActionType }[] =[
-        { key: 'PROJ-1', text: 'moved to sprint', type: 'MOVED'},
-        { key: 'PROJ-2', text: 'deleted', type: 'DELETED'},
-        { key: 'PROJ-3', text: 'retained in backlog', type: 'RETAINED'},
-    ]
+    const { actionHistory } = useAppContext();
 
     return (
         <>
@@ -95,16 +139,23 @@ export default function SwipeSideNav() {
             </SideNavHeader>
 
             <SideNavContent>
-                <MenuList>
-                    {actionHistory.map(item => (
-                        <FlyoutMenuItem key={item.key}>
-                            <FlyoutMenuItemTrigger>
-                                {item.key} {item.text}
-                            </FlyoutMenuItemTrigger>
-                            <ActionHistoryFlyout issueKey={item.key} type={item.type} />
-                        </FlyoutMenuItem>
-                    ))}
-                </MenuList>
+                {/* TODO: replace with empty state + image */}
+                {actionHistory.length === 0 ? (
+                    <Box padding="space.200">
+                        <Text>No actions taken in this session.</Text>
+                    </Box>
+                ) : (
+                    <MenuList>
+                        {actionHistory.map(item => (
+                            <FlyoutMenuItem key={item.id}>
+                                <FlyoutMenuItemTrigger>
+                                    {getActionMessage(item)}
+                                </FlyoutMenuItemTrigger>
+                                <ActionHistoryFlyout item={item} />
+                            </FlyoutMenuItem>
+                        ))}
+                    </MenuList>
+                )}
             </SideNavContent>
         </>
     );

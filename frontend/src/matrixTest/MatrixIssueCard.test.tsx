@@ -12,11 +12,16 @@ const mockIssues = [
     status: "done",
     priorityName: null,
     priorityIconUrl: null,
+    priorityId: null,         // NEW
     assigneeDisplayName: null,
     assigneeAvatarUrl: null,
     issueTypeName: null,
     issueTypeIconUrl: null,
+    epicKey: null,            // NEW
+    epicSummary: null,        // NEW
+    epicColor: null,          // NEW
     description: null,
+    storyPoints: null,        // NEW
     swiped: false,
   },
   {
@@ -26,11 +31,16 @@ const mockIssues = [
     status: "process",
     priorityName: null,
     priorityIconUrl: null,
+    priorityId: null,         // NEW
     assigneeDisplayName: null,
     assigneeAvatarUrl: null,
     issueTypeName: null,
     issueTypeIconUrl: null,
+    epicKey: null,            // NEW
+    epicSummary: null,        // NEW
+    epicColor: null,          // NEW
     description: null,
+    storyPoints: null,        // NEW
     swiped: false,
   },
 ];

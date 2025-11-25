@@ -67,7 +67,8 @@ function Message({ title, body }: MessageProps) {
 	);
 }
 
-// borrowed from swipe mode
+// MatrixMode uses the same state objects as swipe mode, that it gets from AppContext
+// so it doesnt have to maintain its own cache of backlog items and loads quickly
 export default function MatrixMode() {
 	const {
 		swipePage,
@@ -84,7 +85,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 	const [placements, setPlacements] = useState<PlacementMap>({});
 	const [scores, setScores] = useState<Record<string, MatrixScore>>({});
 
-	// initial load I stole from Swipe mode,  fetches the first page of backlog issues
+	// fetches the first page of backlog issues
 	useEffect(() => {
 		if (contextError) {
 			setSwipeError(contextError);
@@ -98,10 +99,13 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 		let cancelled = false;
 
 
-		// this shit was from swipe
+		// Matrix uses same states as swipe
 		async function loadMatrixData() {
 
 			try {
+                if (!boardId) {
+                    return;
+                }
 				setSwipeError(null);
 				setIsSwipeLoading(true);
 				const page = await fetchBacklog({
@@ -147,7 +151,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 	const issues = swipePage?.issues ?? [];
 
-	// whenever the page of issuess changes ensure each issue has a placement entry
+	// whenever the page of issues changes ensure each issue has a placement entry
 	useEffect(() => {
 
 		if (issues.length === 0) {
@@ -216,9 +220,10 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 		return monitorForElements({ 
 			onDrop({ source, location }) {
-				if (!isMatrixIssueDragData(source.data)) {
-					return;
+				const dragData = source.data;
 
+				if (!isMatrixIssueDragData(dragData)) {
+					return;
 				} 
 
 				const destination = location.current.dropTargets[0];
@@ -231,7 +236,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 				if (isMatrixCellDropData(dropData)) {
 
 					setPlacements((prev) => { 
-						const prevPlacement = prev[source.data.issueId];
+						const prevPlacement = prev[dragData.issueId];
 						if (
 							prevPlacement &&
 							prevPlacement.type === 'grid' &&
@@ -247,7 +252,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 						return {
 							...prev,
-							[source.data.issueId]: {
+							[dragData.issueId]: {
 								type: 'grid',
 								coord: { row: dropData.coord.row, col: dropData.coord.col }, 
 							},
@@ -256,7 +261,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 					setScores((prev) => {
 						const nextScore = calculateMatrixScore(dropData.coord, GRID_SIZE);
-						const current = prev[source.data.issueId];
+						const current = prev[dragData.issueId];
 
 						if (
 							current &&
@@ -269,7 +274,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 						return {
 							...prev,
-							[source.data.issueId]: nextScore,
+							[dragData.issueId]: nextScore,
 						};
 					});
 
@@ -278,24 +283,24 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 
 				if (isMatrixBenchDropData(dropData)) {
 					setPlacements((prev) => {
-						const prevPlacement = prev[source.data.issueId];
+						const prevPlacement = prev[dragData.issueId];
 						if (!prevPlacement || prevPlacement.type === 'bench') {
 							return prev;
 						}
 
 						return {
 							...prev,
-							[source.data.issueId]: { type: 'bench' },
+							[dragData.issueId]: { type: 'bench' },
 
 						};
 					});
 
 					setScores((prev) => {
-						if (!(source.data.issueId in prev)) {
+						if (!(dragData.issueId in prev)) {
 							return prev;
 						}
 
-						const { [source.data.issueId]: _removed, ...rest } = prev;
+						const { [dragData.issueId]: _removed, ...rest } = prev;
 						return rest;
 					});
 				}
@@ -339,7 +344,9 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 			return <Message title="No backlog items to rank" body="Switch filters or search to load issues." />;
 		}
 
+		// render
 		return (
+
 			<Box xcss={styles.layout}>
 				<Box xcss={styles.benchColumn}>
 					<MatrixBench issues={benchIssues} />
@@ -365,7 +372,7 @@ const { boardId, isLoading: isContextLoading, error: contextError } = useJiraCon
 				<Heading as="h1" size="large">
 					Matrix Mode
 				</Heading>
-				<Text tone="subtle">
+				<Text>
 					Drag backlog items onto the impact vs effort grid to assign them a priority score.
 				</Text>
 			</Stack>

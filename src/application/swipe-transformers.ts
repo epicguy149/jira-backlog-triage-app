@@ -1,6 +1,6 @@
 import type { SwipeIssue } from "../../contracts/api";
 
-type JiraIssue = {
+export type JiraIssue = {
     id: string;
     key: string;
     fields: {
@@ -9,6 +9,7 @@ type JiraIssue = {
         priority?: { 
             name: string;
             iconUrl: string;
+            id?: string;
         };
         assignee?: { 
             displayName: string;
@@ -23,7 +24,24 @@ type JiraIssue = {
         issuetype?: {
             name: string;
             iconUrl: string;
-        }
+        },
+        epic?: {
+            name: string;
+            summary: string;
+            color?: {
+                key?: string;
+            };
+        };
+        parent?: {
+            id: string;
+            key: string;
+            fields?: {
+                summary?: string;
+                issuetype?: {
+                name: string;
+                };
+            };
+        };
     };
 }
 
@@ -48,9 +66,17 @@ export type JiraBacklogResponse = {
     total: number;
 }
 
+type ToSwipeOpts = {
+    swiped?: boolean;
+    epicKey?: string | null;
+    epicSummary?: string | null;
+    epicColor?: string | null;
+    storyPoints?: number | null;
+}
+
 export function toSwipeIssue(
     issue: JiraIssue,
-    opts: { swiped?: boolean } = {},
+    opts: ToSwipeOpts = {},
 ): SwipeIssue {
     const { fields } = issue;
     const description = parseDescription(fields.description);
@@ -62,6 +88,7 @@ export function toSwipeIssue(
         status: fields.status?.name ?? 'None',
         priorityName: fields.priority?.name ?? null,
         priorityIconUrl: fields.priority?.iconUrl ?? null,
+        priorityId: fields.priority?.id ?? null,
         assigneeDisplayName: fields.assignee?.displayName ?? null,
         assigneeAvatarUrl: 
             fields.assignee?.avatarUrls?.['24x24'] ?? 
@@ -71,6 +98,10 @@ export function toSwipeIssue(
         swiped: opts.swiped ?? false,
         issueTypeName: fields.issuetype?.name ?? null,
         issueTypeIconUrl: fields.issuetype?.iconUrl ?? null,
+        epicKey: opts.epicKey ?? null,
+        epicSummary: opts.epicSummary ?? null,
+        epicColor: opts.epicColor ?? null,
+        storyPoints: opts.storyPoints ?? null,
     };
 }
 

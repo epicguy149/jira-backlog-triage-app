@@ -4,9 +4,23 @@ import {
   type GetBacklogResponse,
   SetIssueSwipedRequestSchema,
   type SetIssueSwipedResponse,
+  DeleteIssueRequestSchema,
+  type DeleteIssueResponse,
+  MoveIssueToSprintRequestSchema,
+  type MoveIssueToSprintResponse,
+  MoveIssueToBacklogRequestSchema,
+  type MoveIssueToBacklogResponse,
+  UpdateIssueRequestSchema,
+  type UpdateIssueResponse
 } from '../../contracts/api';
-import { getBacklog } from '../application/get-backlog';
-import { setIssueSwiped } from '../application/set-swiped';
+import { 
+  getBacklog,
+  setIssueSwiped,
+  deleteIssue,
+  moveIssueToSprint,
+  moveIssueToBacklog,
+  updateIssue
+} from '../application';
 
 const resolver = new Resolver();
 
@@ -29,5 +43,35 @@ resolver.define('setIssueSwiped', async(req): Promise<SetIssueSwipedResponse> =>
   
   return setIssueSwiped(payload, { accountId });
 })
+
+resolver.define('deleteIssue', async (req): Promise<DeleteIssueResponse> => {
+  const payload = DeleteIssueRequestSchema.parse(req.payload);
+  
+  return deleteIssue(payload);
+});
+
+resolver.define(
+  'moveIssueToSprint',
+  async (req): Promise<MoveIssueToSprintResponse> => {
+    const payload = MoveIssueToSprintRequestSchema.parse(req.payload);
+
+    return moveIssueToSprint(payload);
+  },
+);
+
+resolver.define(
+  'moveIssueToBacklog',
+  async (req): Promise<MoveIssueToBacklogResponse> => {
+    const payload = MoveIssueToBacklogRequestSchema.parse(req.payload);
+    return moveIssueToBacklog(payload);
+  },
+);
+
+resolver.define(
+  'updateIssue',
+  async (req): Promise<UpdateIssueResponse> => {
+    const payload = UpdateIssueRequestSchema.parse(req.payload);
+    return updateIssue(payload);
+});
 
 export const handler = resolver.getDefinitions();

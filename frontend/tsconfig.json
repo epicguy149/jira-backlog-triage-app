@@ -2,10 +2,16 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "@compiled/react",
     "noEmit": true,
-    "types": ["jest", "@testing-library/jest-dom", "node"]
+    "types": ["jest", "node"],
+    "typeRoots": [
+      "node_modules/@types",
+      "src/types"
+    ],
   },
   "include": ["src", "**/*.test.ts", "**/*.test.tsx"],
   "exclude": [

@@ -91,10 +91,10 @@ export function isMatrixBenchDropData(data: unknown): data is MatrixBenchDropDat
 }
 
 // asdf
-export type CellIssue = {
-	issue: SwipeIssue;
-	location: CardLocation;
-};
+//export type CellIssue = {
+//	issue: SwipeIssue;
+//	location: CardLocation;
+//};
 
 export function calculateMatrixScore(coord: MatrixCoord, gridSize: number): MatrixScore {
 	const impact = Math.round(((coord.col + 1) / gridSize) * 10);

@@ -32,56 +32,76 @@ const mockIssues = [
     id: "ISS-1",
     key: "ISS-1",
     summary: "Test summary",
-    status: "Done",
+    status: "done",
     priorityName: null,
     priorityIconUrl: null,
+    priorityId: null,         // NEW
     assigneeDisplayName: null,
     assigneeAvatarUrl: null,
     issueTypeName: null,
     issueTypeIconUrl: null,
+    epicKey: null,            // NEW
+    epicSummary: null,        // NEW
+    epicColor: null,          // NEW
     description: null,
+    storyPoints: null,        // NEW
     swiped: false,
   },
   {
     id: "ISS-2",
     key: "ISS-2",
     summary: "Test summary",
-    status: "Done",
+    status: "done",
     priorityName: null,
     priorityIconUrl: null,
+    priorityId: null,         // NEW
     assigneeDisplayName: null,
     assigneeAvatarUrl: null,
     issueTypeName: null,
     issueTypeIconUrl: null,
+    epicKey: null,            // NEW
+    epicSummary: null,        // NEW
+    epicColor: null,          // NEW
     description: null,
+    storyPoints: null,        // NEW
     swiped: false,
   },
   {
     id: "ISS-3",
     key: "ISS-3",
     summary: "Test summary",
-    status: "Done",
+    status: "done",
     priorityName: null,
     priorityIconUrl: null,
+    priorityId: null,         // NEW
     assigneeDisplayName: null,
     assigneeAvatarUrl: null,
     issueTypeName: null,
     issueTypeIconUrl: null,
+    epicKey: null,            // NEW
+    epicSummary: null,        // NEW
+    epicColor: null,          // NEW
     description: null,
+    storyPoints: null,        // NEW
     swiped: false,
   },
   {
     id: "ISS-4",
     key: "ISS-4",
     summary: "Test summary",
-    status: "Done",
+    status: "done",
     priorityName: null,
     priorityIconUrl: null,
+    priorityId: null,         // NEW
     assigneeDisplayName: null,
     assigneeAvatarUrl: null,
     issueTypeName: null,
     issueTypeIconUrl: null,
+    epicKey: null,            // NEW
+    epicSummary: null,        // NEW
+    epicColor: null,          // NEW
     description: null,
+    storyPoints: null,        // NEW
     swiped: false,
   },
 ];
