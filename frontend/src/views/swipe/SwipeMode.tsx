@@ -304,6 +304,43 @@ export default function SwipeMode() {
 		[boardId, setBanner, setSwipePage, addActionHistory, swipePage],
 	);
 
+	useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // avoid triggering if typing in an input
+            const target = e.target as HTMLElement;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
+                return;
+            }
+
+            if (!selectedIssue) return;
+
+            let direction: SwipeDirection | null = null;
+            if (e.key === 'ArrowLeft') {
+                direction = 'left';
+            } else if (e.key === 'ArrowRight') {
+                direction = 'right';
+            } else if (e.key === 'ArrowUp') {
+                direction = 'up';
+            }
+
+            if (direction) {
+                e.preventDefault();
+                
+                // select next issue
+                const currentIndex = issuesToShow.findIndex(i => i.id === selectedIssue.id);
+                if (currentIndex !== -1) {
+                    const nextIssue = issuesToShow[currentIndex + 1] || issuesToShow[currentIndex - 1] || null;
+                    setSelectedIssue(nextIssue);
+                }
+
+                handleIssueSwipe(selectedIssue, direction);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedIssue, issuesToShow, handleIssueSwipe]);
+
     // handles history action (flyout actions)
     useEffect(() => {
 		if (!historyActionRequest) {
