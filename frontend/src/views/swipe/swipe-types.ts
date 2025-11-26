@@ -1,3 +1,5 @@
+import { SwipeIssue } from "~contracts/api";
+
 export type SwipeDirection = 'left' | 'right' | 'up';
 
 export type SwipeActionType = 
@@ -13,4 +15,5 @@ export type ActionHistoryItem = {
     sprintName?: string;
     disabled?: boolean;
     label?: string;
+    issue?: SwipeIssue;
 }

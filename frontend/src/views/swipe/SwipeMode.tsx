@@ -263,6 +263,7 @@ export default function SwipeMode() {
                     key: issueKey,
                     type: actionType,
                     sprintName,
+					issue: issue
                 });
 
                 // set banner message for action taken
@@ -409,6 +410,14 @@ export default function SwipeMode() {
 						searchQuery,
 						filters: swipeFilters,
 					});
+					
+					// add issue back to page 
+					if (item.issue) {
+                        const swipedIssue = page.issues.find((i) => i.key === item.issue?.key);
+                        if (!swipedIssue) {
+                            page.issues.unshift(item.issue);
+                        }
+                    }
 
 					setSwipePage(page);
 
@@ -424,6 +433,7 @@ export default function SwipeMode() {
 						sprintName: item.sprintName,
 						label: undoMsg,
 						disabled: true,
+						issue: item.issue,
 					});
 
 					setBanner({
