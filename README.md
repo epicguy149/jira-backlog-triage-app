@@ -158,7 +158,7 @@ forge register
 forge install
 ```
 
-## How to Test
+## How to Test (backend)
 
 ### Step 1: 
 <br>
@@ -166,6 +166,25 @@ forge install
 <b>Download dependencies</b>
 ```
 npm i
+```
+
+### Step 2: 
+<br>
+
+<b>Run the test</b>
+```
+npm test
+```
+
+
+## How to Test (Matrix frontend tests)
+
+### Step 1: 
+<br>
+
+<b>Download dependencies</b>
+```
+npm run install_ or (1. npm i, 2. cd frontend, 3. npm i)
 ```
 
 ### Step 2: 
