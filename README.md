@@ -1,46 +1,190 @@
-# Forge Hello World
+# Log Juggler
 
-This project contains a Forge app written in Javascript that displays `Hello World!` in a Jira backlog action. 
+This app is a backlog filtering app which assists managers and software developers to clear up there backlogs on Jira. The App was developed through the Forge Framework. 
 
-See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
+## Software Required
 
-## Requirements
+This project requires the following software tools to be installed:
 
-See [Set up Forge](https://developer.atlassian.com/platform/forge/set-up-forge/) for instructions to get set up.
+### Visual Studio
+<div align="center">
+<img src="./Images/Visual Studios.png" alt="Visual Studio" width="200"/>
+</div>
 
-## Quick start
-- Install top-level dependencies:
+<br>
+
+<div align="center">
+
+<b>
+
+Download Visual Studio from the official website:  
+[https://visualstudio.microsoft.com/downloads/](https://visualstudio.microsoft.com/downloads/)
+
+</b>
+
+</div>
+
+<br>
+
+<b>Install the extention Dev Containers.</b><br>
+<div align="center">
+<img src="./Images/Dev Containers image.png" alt="Visual Studio" width="200"/>
+</div>
+
+<br>
+
+### Docker Desktop
+<div align="center">
+<img src="./Images/Docker Desktop icon.png" alt="Docker Desktop" width="200"/>
+</div>
+
+<div align="center">
+<b>
+
+Download Docker Desktop from the official website:  
+[https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
+
+</b>
+</div>
+
+## Jira set up
+
+
+<br>
+
+<div align="center">
+<b>
+
+Make a jira account with a domain within jira.<br>
+[http://go.atlassian.com/cloud-dev](http://go.atlassian.com/cloud-dev)
+
+</b>
+</div>
+
+<br>
+
+<div align="center">
+<b>
+
+Make a API Token in Jira.<br>
+[https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
+
+</b>
+</div>
+
+<br>
+
+<div align="center">
+<b>Enter your Jira domain and your ready to install the app.</b>
+</div>
+
+## How to Install
+
+### Step 1: 
+<br>
+
+<b>Clone Repo</b>
+
 ```
-npm install
+git clone https://github.com/unsw-cse-comp99-3900/capstone-project-25t3-3900-h18b-apple.git
 ```
 
-- Install dependencies inside of the `static/hello-world` directory:
+### Step 2:
+<br>
+<b>In visual studios press the key board shortcut.</b>
+
+<br>
+
 ```
-npm install
+CTRL + SHIFT + P
 ```
 
-- Modify your app by editing the files in `static/hello-world/src/`.
+### Step 3:
 
-- Build your app (inside of the `static/hello-world` directory):
+<br>
+
+<b>Click Dev Containers: Open Folder in Container</b>
+
+<br>
+
+<div align="center">
+<img src="./Images/Package to install container.png" alt="Visual Studio" width="400"/>
+</div>
+<br>
+<b>Ensure you have Docker Desktop running in the background</b>
+<br>
+
+### Step 4:
+<br>
+
+<b>Log in with you Forge email and Forge API token</b>
+
+<br>
+
 ```
-npm run build
+export FORGE_EMAIL="YOUR EMAIL"
+```
+<br>
+
+```
+export FORGE_API_TOKEN="YOUR TOKEN"
 ```
 
-- Deploy your app by running:
-```
-forge deploy
-```
+<br>
+To check your login worked.<br>
 
-- Install your app in an Atlassian site by running:
+```
+forge whoami
+```
+<br>
+
+### Step 5:
+
+<b>Register the App</b>
+
+```
+forge register
+```
+<br>
+
+### Step 6: 
+<br>
+
+<b>Install the app on your jira domain.</b>
+
+<br>
+
 ```
 forge install
 ```
 
-### Notes
-- Use the `forge deploy` command when you want to persist code changes.
-- Use the `forge install` command when you want to install the app on a new site.
-- Once the app is installed on a site, the site picks up the new app changes you deploy without needing to rerun the install command.
+## How to Test
 
-## Support
+### Step 1: 
+<br>
 
-See [Get help](https://developer.atlassian.com/platform/forge/get-help/) for how to get help and provide feedback.
+<b>Download dependencies</b>
+```
+npm i
+```
+
+### Step 2: 
+<br>
+
+<b>Go to the directory</b>
+```
+cd frontend/src/matrixTest
+```
+
+### Step 3: 
+<br>
+
+<b>Run the test</b>
+```
+npm test
+```
+
+<b>Or you want choose the specific tests</b>
+```
+npm test MatrixBench.test.tsx
+```
