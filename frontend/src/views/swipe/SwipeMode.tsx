@@ -423,6 +423,7 @@ export default function SwipeMode() {
 						type: item.type,
 						sprintName: item.sprintName,
 						label: undoMsg,
+						disabled: true,
 					});
 
 					setBanner({
