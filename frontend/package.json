@@ -22,6 +22,7 @@
     "@atlaskit/lozenge": "^13.1.0",
     "@atlaskit/modal-dialog": "^14.7.0",
     "@atlaskit/navigation-system": "^5.3.4",
+    "@atlaskit/popup": "^4.6.4",
     "@atlaskit/primitives": "^16.1.1",
     "@atlaskit/select": "^21.4.0",
     "@atlaskit/tag": "^14.1.15",

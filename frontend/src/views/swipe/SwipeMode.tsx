@@ -219,6 +219,15 @@ export default function SwipeMode() {
 				: 'retain';
 
             const originalIssues = swipePage.issues;
+
+			// dont allow swiping of swiped issues, show warning
+			if (actionType === 'retain' && issue.swiped) {
+                setBanner({
+                    type: 'warning',
+                    message: `${issueKey} already retained in backlog`,
+                });
+                return false;
+            }
             
             // optimistically remove from grid immediately after swipe
             setSwipePage({
@@ -263,6 +272,7 @@ export default function SwipeMode() {
                     key: issueKey,
                     type: actionType,
                     sprintName,
+					issue: issue
                 });
 
                 // set banner message for action taken
@@ -303,6 +313,43 @@ export default function SwipeMode() {
 		},
 		[boardId, setBanner, setSwipePage, addActionHistory, swipePage],
 	);
+
+	useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // avoid triggering if typing in an input
+            const target = e.target as HTMLElement;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) {
+                return;
+            }
+
+            if (!selectedIssue) return;
+
+            let direction: SwipeDirection | null = null;
+            if (e.key === 'ArrowLeft') {
+                direction = 'left';
+            } else if (e.key === 'ArrowRight') {
+                direction = 'right';
+            } else if (e.key === 'ArrowUp') {
+                direction = 'up';
+            }
+
+            if (direction) {
+                e.preventDefault();
+                
+                // select next issue
+                const currentIndex = issuesToShow.findIndex(i => i.id === selectedIssue.id);
+                if (currentIndex !== -1) {
+                    const nextIssue = issuesToShow[currentIndex + 1] || issuesToShow[currentIndex - 1] || null;
+                    setSelectedIssue(nextIssue);
+                }
+
+                handleIssueSwipe(selectedIssue, direction);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedIssue, issuesToShow, handleIssueSwipe]);
 
     // handles history action (flyout actions)
     useEffect(() => {
@@ -372,6 +419,14 @@ export default function SwipeMode() {
 						searchQuery,
 						filters: swipeFilters,
 					});
+					
+					// add issue back to page 
+					if (item.issue) {
+                        const swipedIssue = page.issues.find((i) => i.key === item.issue?.key);
+                        if (!swipedIssue) {
+                            page.issues.unshift(item.issue);
+                        }
+                    }
 
 					setSwipePage(page);
 
@@ -386,6 +441,8 @@ export default function SwipeMode() {
 						type: item.type,
 						sprintName: item.sprintName,
 						label: undoMsg,
+						disabled: true,
+						issue: item.issue,
 					});
 
 					setBanner({

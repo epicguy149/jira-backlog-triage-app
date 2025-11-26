@@ -25,9 +25,12 @@ export async function moveIssueToSprint(
             route`/rest/agile/1.0/board/${boardId}/sprint?state=active`,
         );
 
-        const getSprintsData = (await getSprintsRes.json()) as JiraSprintList;
+        let sprints: JiraSprint[] = [];
 
-        const sprints = getSprintsData.values ?? [];
+        if (getSprintsRes.ok) {
+            const getSprintsData = (await getSprintsRes.json()) as JiraSprintList;
+            sprints = getSprintsData.values ?? [];
+        }
 
         if (!getSprintsRes.ok || sprints.length === 0) {
             return MoveIssueToSprintResponseSchema.parse({
@@ -36,8 +39,7 @@ export async function moveIssueToSprint(
             });
         }
 
-        // first active sprint
-        const sprint = sprints[0];
+        const sprint = sprints.find((s) => s.state === 'active') ?? sprints[0];
         const sprintId = sprint.id;
 
         const bodyData = JSON.stringify({ issues: [issueIdOrKey] });

@@ -90,6 +90,7 @@ export function SwipeToolbar() {
                     elemBeforeInput={<SearchIconBefore />}
                     value={localQuery}
                     onChange={handleChange}
+                    isDisabled
                 />
             </Box>
 

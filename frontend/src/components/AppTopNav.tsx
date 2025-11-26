@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useAppContext, type View } from '../app/AppContext';
 import { 
   TopNavStart,
@@ -12,9 +12,12 @@ import { Settings } from '@atlaskit/navigation-system/top-nav-items';
 import GridIcon from '@atlaskit/icon/core/grid';
 import ChangesIcon from '@atlaskit/icon/core/changes';
 import { JiraIcon } from '@atlaskit/logo';
+import { Box, Stack, Text } from '@atlaskit/primitives';
+import Popup from '@atlaskit/popup';
 
 export default React.memo(function AppTopNav() {
     const { view, setView, isSettingsOpen, setIsSettingsOpen, setBanner } = useAppContext();
+    const [isHelpOpen, setIsHelpOpen] = useState(false);
 
     // banner auto dismiss
     const bannerTimeoutRef = useRef<number | null>(null);
@@ -74,7 +77,42 @@ export default React.memo(function AppTopNav() {
             <TopNavEnd>
                 {/* Was to be implemented: chat with AI that already has context of entire project */}
                 {/* <TopNavButton iconBefore={AiChatIcon}>Chat with AI</TopNavButton> */}
-                <Help label="Help" />
+                
+                {/* help icon */}
+                <Popup
+                    isOpen={isHelpOpen}
+                    onClose={() => setIsHelpOpen(false)}
+                    placement="bottom-end"
+                    trigger={(triggerProps) => (
+                        <Help 
+                            {...triggerProps}
+                            label="Help" 
+                            isSelected={isHelpOpen}
+                            onClick={() => setIsHelpOpen(!isHelpOpen)}
+                        />
+                    )}
+                    content={() => (
+                        <Box padding="space.300">
+                            <Stack space="space.200">
+                                <Text weight="bold" size="large">How to use</Text>
+                                
+                                <Stack space="space.050">
+                                    <Text weight="semibold">Controls (Swipe or arrow keys)</Text>
+                                    <Text><Text weight="bold">Right</Text>: Keep in backlog</Text>
+                                    <Text><Text weight="bold">Left</Text>: Delete issue (destructive and irreversible)</Text>
+                                    <Text><Text weight="bold">Up</Text>: Move to active sprint</Text>
+                                </Stack>
+
+                                <Stack space="space.100">
+                                    <Text weight="semibold">Tips</Text>
+                                    <Text size="small">• Use the sidebar history to review and undo actions.</Text>
+                                    <Text size="small">• Click on the summary, priority or story point estimate to edit.</Text>
+                                    <Text size="small">• Issues can be filtered by swiped/unswiped status through the Filters button.</Text>
+                                </Stack>
+                            </Stack>
+                        </Box>
+                    )}
+                />
                 <Settings
                     label="Settings"
                     onClick={() => setIsSettingsOpen(!isSettingsOpen)}
