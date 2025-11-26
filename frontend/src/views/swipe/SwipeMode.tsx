@@ -219,6 +219,15 @@ export default function SwipeMode() {
 				: 'retain';
 
             const originalIssues = swipePage.issues;
+
+			// dont allow swiping of swiped issues, show warning
+			if (actionType === 'retain' && issue.swiped) {
+                setBanner({
+                    type: 'warning',
+                    message: `${issueKey} already retained in backlog`,
+                });
+                return false;
+            }
             
             // optimistically remove from grid immediately after swipe
             setSwipePage({
