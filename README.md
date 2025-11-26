@@ -157,3 +157,34 @@ forge register
 ```
 forge install
 ```
+
+## How to Test
+
+### Step 1: 
+<br>
+
+<b>Download dependencies</b>
+```
+npm i
+```
+
+### Step 2: 
+<br>
+
+<b>Go to the directory</b>
+```
+cd frontend/src/matrixTest
+```
+
+### Step 3: 
+<br>
+
+<b>Run the test</b>
+```
+npm test
+```
+
+<b>Or you want choose the specific tests</b>
+```
+npm test MatrixBench.test.tsx
+```
