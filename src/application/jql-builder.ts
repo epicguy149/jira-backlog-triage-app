@@ -34,9 +34,9 @@ export function buildJqlQuery(options: JqlBuilderOptions): string | null {
         const keyList = swipedKeys.map((k) => `"${k}"`).join(',');
         
         if (showUnswiped && !showSwiped) {
-            jqlClauses.push(`issuekey  NOT IN (${keyList})`);
+            jqlClauses.push(`issuekey NOT IN (${keyList})`);
         } else if (!showUnswiped && showSwiped) {
-            jqlClauses.push(`issuekey  IN (${keyList})`);
+            jqlClauses.push(`issuekey IN (${keyList})`);
         }
     } else if (!showUnswiped && showSwiped) {
         return null; 
