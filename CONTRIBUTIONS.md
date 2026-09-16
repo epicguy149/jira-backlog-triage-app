@@ -36,17 +36,22 @@ built inside it.
 
 ## Verifying this
 
-Commit counts on the shipped branch, excluding merge commits:
+Commit counts on this branch, excluding merge commits:
 
 ```
 git shortlog -sne --no-merges main
 git rev-list main --count --no-merges
 ```
 
-At time of publication this returns **245 of 305 commits (80%)** authored by me,
-with the remainder distributed across the other four team members.
+This reports **245 of 305 commits (80%)** authored by me, matching the original
+project repository.
 
-Note that commit counts measure activity, not value, and the figure above spans
+GitHub's contributor graph for this repository shows a lower absolute count,
+because it omits commits whose changes fell entirely within course-specific
+build files that were removed when this history was sanitized. The proportion
+is comparable either way, and I remain the top contributor by roughly 15x.
+
+Commit counts measure activity rather than value, and the figure above spans
 the whole project including the pre-refactor codebase that was ultimately
 replaced. The more meaningful statement is the scope breakdown above, which can
 be checked directly against the source tree.
