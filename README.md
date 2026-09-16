@@ -1,209 +1,88 @@
-# Log Juggler
+# Jira Backlog Triage App
 
-This app is a backlog filtering app which assists managers and software developers to clear up there backlogs on Jira. The App was developed through the Forge Framework. 
+**Log Juggler** is an Atlassian Forge application for reviewing, editing, and triaging Jira backlog issues through an interactive workflow.
 
-## Software Required
+Built with **TypeScript, React, Atlassian Forge, Atlaskit, Zod, Jest, and the Jira REST and Agile APIs**.
 
-This project requires the following software tools to be installed:
+## Features
 
-### Visual Studio
-<div align="center">
-<img src="./Images/Visual Studios.png" alt="Visual Studio" width="200"/>
-</div>
+* **Interactive backlog triage** — review Jira issues using swipe gestures or keyboard controls and choose to retain, delete, or move issues into an active sprint.
+* **Inline issue editing** — update issue summaries, priorities, story-point estimates, and other supported Jira fields directly from the triage interface.
+* **Persistent review state** — stores per-user, per-board review state so previously triaged issues can be tracked across sessions.
+* **Action history and undo** — maintains in-session action history and supports undo for applicable actions.
+* **Optimistic updates with rollback** — updates the interface immediately while restoring the previous state if a backend operation fails.
+* **Jira integration** — retrieves and updates issues through Jira REST and Agile APIs.
+* **Typed API contracts** — shared Zod schemas define and validate data exchanged between the frontend and backend.
 
-<br>
+## Architecture
 
-<div align="center">
+The application is split into a React Custom UI frontend and an Atlassian Forge backend.
 
-<b>
-
-Download Visual Studio from the official website:  
-[https://visualstudio.microsoft.com/downloads/](https://visualstudio.microsoft.com/downloads/)
-
-</b>
-
-</div>
-
-<br>
-
-<b>Install the extention Dev Containers.</b><br>
-<div align="center">
-<img src="./Images/Dev Containers image.png" alt="Visual Studio" width="200"/>
-</div>
-
-<br>
-
-### Docker Desktop
-<div align="center">
-<img src="./Images/Docker Desktop icon.png" alt="Docker Desktop" width="200"/>
-</div>
-
-<div align="center">
-<b>
-
-Download Docker Desktop from the official website:  
-[https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
-
-</b>
-</div>
-
-## Jira set up
-
-
-<br>
-
-<div align="center">
-<b>
-
-Make a jira account with a domain within jira.<br>
-[http://go.atlassian.com/cloud-dev](http://go.atlassian.com/cloud-dev)
-
-</b>
-</div>
-
-<br>
-
-<div align="center">
-<b>
-
-Make a API Token in Jira.<br>
-[https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
-
-</b>
-</div>
-
-<br>
-
-<div align="center">
-<b>Enter your Jira domain and your ready to install the app.</b>
-</div>
-
-## How to Install
-
-### Step 1: 
-<br>
-
-<b>Clone Repo</b>
-
-```
-git clone https://github.com/unsw-cse-comp99-3900/capstone-project-25t3-3900-h18b-apple.git
+```text
+React Custom UI
+      |
+      v
+Shared API contracts
+      |
+      v
+Forge resolvers
+      |
+      v
+Application services
+     /         \
+    v           v
+Jira APIs   Forge storage
 ```
 
-### Step 2:
-<br>
-<b>In visual studios press the key board shortcut.</b>
+The frontend handles issue presentation, interaction state, inline editing, action history, and optimistic updates. Forge resolvers expose the backend operations used by the interface, while application services contain Jira integration and triage logic. Per-user review state is persisted using Forge-hosted storage.
 
-<br>
+## Swipe Mode
 
-```
-CTRL + SHIFT + P
-```
+Swipe Mode is the primary triage workflow.
 
-### Step 3:
+Issues can be reviewed individually using drag gestures or keyboard controls. Actions are mapped to retaining an issue, deleting it, or moving it into an active sprint. The interface performs optimistic updates so the next issue can be displayed immediately, while failed backend operations restore the previous state.
 
-<br>
+Issue fields can also be edited directly from the card without leaving the triage workflow.
 
-<b>Click Dev Containers: Open Folder in Container</b>
+## Testing
 
-<br>
+Backend Jest tests cover application logic, persistence behaviour, Jira field handling, query construction, and failure paths.
 
-<div align="center">
-<img src="./Images/Package to install container.png" alt="Visual Studio" width="400"/>
-</div>
-<br>
-<b>Ensure you have Docker Desktop running in the background</b>
-<br>
+The repository also contains frontend tests for Matrix Mode.
 
-### Step 4:
-<br>
+## My Contribution
 
-<b>Log in with you Forge email and Forge API token</b>
+This project was developed as a team capstone. I served as **Scrum Master and Software Developer**.
 
-<br>
+I designed and implemented the final application architecture and all major functionality except **Matrix Mode and its frontend test suite**, which were implemented by other team members.
 
-```
-export FORGE_EMAIL="YOUR EMAIL"
-```
-<br>
+My engineering work included:
 
-```
-export FORGE_API_TOKEN="YOUR TOKEN"
-```
+* overall frontend/backend application architecture;
+* shared TypeScript and Zod API contracts;
+* Jira backlog retrieval and field mapping;
+* Jira REST and Agile API integration;
+* Swipe Mode and its interaction workflow;
+* inline issue editing;
+* persistent per-user review state;
+* action history and undo;
+* optimistic updates and rollback;
+* backend application logic and Jest tests.
 
-<br>
-To check your login worked.<br>
+I also contributed to sprint planning, Jira stories and epics, meetings, Git workflow, code review, and overall project coordination.
 
-```
-forge whoami
-```
-<br>
+## Project Scope
 
-### Step 5:
-
-<b>Register the App</b>
-
-```
-forge register
-```
-<br>
-
-### Step 6: 
-<br>
-
-<b>Install the app on your jira domain.</b>
-
-<br>
-
-```
-forge install
-```
-
-## How to Test (backend)
-
-### Step 1: 
-<br>
-
-<b>Download dependencies</b>
-```
-npm i
-```
-
-### Step 2: 
-<br>
-
-<b>Run the test</b>
-```
-npm test
-```
+This repository represents the completed capstone application. It is intended as a portfolio example of full-stack TypeScript development, external API integration, application architecture, state management, testing, and collaborative software development.
 
 
-## How to Test (Matrix frontend tests)
+Screenshots:
 
-### Step 1: 
-<br>
 
-<b>Download dependencies</b>
-```
-npm run install_ or (1. npm i, 2. cd frontend, 3. npm i)
-```
+<img width="664" height="235" alt="image" src="https://github.com/user-attachments/assets/e99f1c8c-2bc3-4430-9a11-afb18884cc62" />
 
-### Step 2: 
-<br>
+<img width="610" height="163" alt="image" src="https://github.com/user-attachments/assets/3995918a-f77a-4a92-807e-03e4df0533bb" />
 
-<b>Go to the directory</b>
-```
-cd frontend/src/matrixTest
-```
+<img width="636" height="256" alt="image" src="https://github.com/user-attachments/assets/900d5b0f-9a1b-4990-939e-4a47d8d74061" />
 
-### Step 3: 
-<br>
 
-<b>Run the test</b>
-```
-npm test
-```
-
-<b>Or you want choose the specific tests</b>
-```
-npm test MatrixBench.test.tsx
-```
